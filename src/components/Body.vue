@@ -39,7 +39,9 @@
               <div class="load_spinner" v-if="show_spinner"></div>
             </div>
           </div>
-          <div class="meaning-container">This is a meaning</div>
+          <div class="meaning-container" v-if=meaning>
+            {{ meaning }}
+          </div>
         </div>
       </div>
     </div>
@@ -61,26 +63,25 @@ export default {
     return {
       slang: "",
       show_spinner: false,
-      meaning: ''
+      meaning: null,
     };
   },
   methods: {
     async HANDLEGETSLANGMEANING() {
       if (this.slang !== "") {
         this.show_spinner = !this.show_spinner;
+        this.meaning = null
         const collection_ref = collection(db, "slang");
         const data = await getDocs(
           query(collection_ref, where("slang", "==", this.slang))
         );
         const datas = data.docs.map((doc) => {
-          return {
-            ...doc.data(),
-            id: doc.id,
-          };
+          this.meaning = doc.data().meaning;
+          return doc.data().meaning;
         });
-        console.log(datas);
-        this.meaning = datas.meaning;
-        console.log(this.meaning)
+        if (this.meaning === null) {
+          this.meaning = 'Sorry no meaning for this slang yet!';
+        }
         this.show_spinner = !this.show_spinner;
       }
     },
@@ -173,6 +174,7 @@ export default {
   padding: 20px 10px;
   border-radius: 20px;
   border: 4px solid green;
+  font-family: sans-serif;
 }
 .input {
   background-color: white;
