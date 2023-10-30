@@ -20,12 +20,11 @@
             <span>Start by entering a slang,</span> and our dictionary will spit
             out an abbreviation.
           </p>
-          <p></p>
-
           <p class="note">
             *For now slang are one way. For example a slang can only translate
             to its meaning and not the other way round
           </p>
+          <p class="note">Note: Slangs searched should start with capital letter so you get the meaning</p>
         </div>
         <div class="slang-input-container">
           <div class="slanginput">
@@ -83,7 +82,7 @@ export default {
           return doc.data().meaning;
         });
         if (this.meaning === null) {
-          this.meaning = "Sorry no meaning for this slang yet!";
+          this.meaning = "Sorry no meaning for this slang yet or check the note guidelines for any wrong way of search";
         }
         this.show_spinner = !this.show_spinner;
       }
@@ -155,10 +154,10 @@ export default {
   line-height: 2.25rem;
   font-weight: 700;
   color: #a6e3a6;
+  margin-bottom: 27px;
 }
 .note {
   color: #7b87a1;
-  margin-top: 27px;
   font-family: sans-serif;
   font-size: 15px;
 }
