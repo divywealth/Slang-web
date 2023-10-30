@@ -2,6 +2,7 @@
   <div class="home">
     <NavBar />
     <Body />
+    <Footer />
   </div>
 </template>
 
@@ -17,5 +18,10 @@ export default {
 </script>
 
 <style scoped> 
+.home {
+  padding: 0;
+  top: 0;
+  bottom: 0;
+}
 
 </style>
