@@ -29,17 +29,20 @@
         </div>
         <div class="slang-input-container">
           <div class="slanginput">
-            <input
-              placeholder="Search slang full meaning..."
-              class="input"
-              v-model="slang"
-            />
+            <div class="input-section">
+              <font-awesome-icon icon="fa-solid fa-search" class="search-icon"/>
+              <input
+                placeholder="Search slang full meaning..."
+                class="input"
+                v-model="slang"
+              />
+            </div>
             <div class="button" @click="HANDLEGETSLANGMEANING">
               <span v-if="!show_spinner">Search</span>
               <div class="load_spinner" v-if="show_spinner"></div>
             </div>
           </div>
-          <div class="meaning-container" v-if=meaning>
+          <div class="meaning-container" v-if="meaning">
             {{ meaning }}
           </div>
         </div>
@@ -70,7 +73,7 @@ export default {
     async HANDLEGETSLANGMEANING() {
       if (this.slang !== "") {
         this.show_spinner = !this.show_spinner;
-        this.meaning = null
+        this.meaning = null;
         const collection_ref = collection(db, "slang");
         const data = await getDocs(
           query(collection_ref, where("slang", "==", this.slang))
@@ -80,7 +83,7 @@ export default {
           return doc.data().meaning;
         });
         if (this.meaning === null) {
-          this.meaning = 'Sorry no meaning for this slang yet!';
+          this.meaning = "Sorry no meaning for this slang yet!";
         }
         this.show_spinner = !this.show_spinner;
       }
@@ -102,6 +105,7 @@ export default {
   align-items: center;
 }
 .statement-one {
+  text-align: center;
   font-weight: 800;
   font-size: 4rem;
   font-family: sans-serif;
@@ -109,6 +113,7 @@ export default {
 }
 .statement-two {
   color: white;
+  text-align: center;
   font-weight: 800;
   margin-top: 0.5rem;
   font-size: 3.8rem;
@@ -171,26 +176,40 @@ export default {
 .meaning-container {
   background: white;
   margin-top: 20px;
-  padding: 20px 10px;
   border-radius: 20px;
   border: 4px solid green;
   font-family: sans-serif;
+  padding: 10px 10px;
+}
+.search-icon {
+  background: white;
+  color: green;
 }
 .input {
+  border: none;
   background-color: white;
-  border: 2px solid #a6e3a6;
-  border-radius: 50px;
-  padding: 10px 30px;
+  padding: 0 10px;
+  margin: 7px 15px;
   font-size: 17px;
   width: 235px;
   height: 30px;
+  border-radius: 20px
+}
+.input:focus {
+  outline: none;
+}
+.input-section {
+  background-color: white;
+  border: 2px solid #a6e3a6;
+  border-radius: 50px;
+  padding-left: 10px;
 }
 .button {
   background-color: #48bb48;
   border: none;
   margin-left: 20px;
   cursor: pointer;
-  padding: 15px 35px;
+  padding: 15px 45px;
   border-radius: 10px;
   height: 20px;
   display: flex;
@@ -278,6 +297,64 @@ export default {
   }
   from {
     transform: rotate(-3deg) translateX(-15%);
+  }
+}
+@media only screen and (max-width: 1030px) {
+  .main-body {
+    padding: 2.5rem 2.5rem;
+  }
+  .statement-one {
+    font-size: 3rem;
+  }
+  .statement-two {
+    font-size: 3rem;
+  }
+  .slangInput-section {
+    display: block;
+    justify-content: center;
+    margin-top: 50px;
+  }
+  .slanginput-writing {
+    width: 100%;
+    text-align: center;
+    margin-right: 10%;
+  }
+  .slang-input-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+  .note {
+    font-size: 18px;
+  }
+}
+@media only screen and (max-width: 900px) {
+  .main-body {
+    padding: 10px 10px;
+  }
+  .slang-display-section {
+    display: none;
+  }
+  .statement-one {
+    font-size: 40px;
+  }
+  .statement-two {
+    margin-top: 10px;
+    font-size: 40px;
+  }
+  .top-writing {
+    font-size: 25px;
+    line-height: 2rem;
+  }
+  .slanginput {
+    display: block;
+  }
+  .input {
+  }
+  .button {
+    margin-top: 20px;
+    margin-left: 0
   }
 }
 </style>
