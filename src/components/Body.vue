@@ -179,7 +179,7 @@ export default {
   border-radius: 20px;
   border: 4px solid green;
   font-family: sans-serif;
-  padding: 10px 10px;
+  padding: 20px 10px;
 }
 .search-icon {
   background: white;
@@ -355,6 +355,9 @@ export default {
   .button {
     margin-top: 20px;
     margin-left: 0
+  }
+  .meaning-container {
+    padding: 10px 10px;
   }
 }
 </style>
