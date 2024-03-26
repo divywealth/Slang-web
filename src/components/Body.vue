@@ -24,12 +24,18 @@
             *For now slang are one way. For example a slang can only translate
             to its meaning and not the other way round
           </p>
-          <p class="note">Note: Slangs searched should start with capital letter so you get the meaning</p>
+          <p class="note">
+            Note: Slangs searched should start with capital letter so you get
+            the meaning
+          </p>
         </div>
         <div class="slang-input-container">
           <div class="slanginput">
             <div class="input-section">
-              <font-awesome-icon icon="fa-solid fa-search" class="search-icon"/>
+              <font-awesome-icon
+                icon="fa-solid fa-search"
+                class="search-icon"
+              />
               <input
                 placeholder="Search slang full meaning..."
                 class="input"
@@ -73,16 +79,18 @@ export default {
       if (this.slang !== "") {
         this.show_spinner = !this.show_spinner;
         this.meaning = null;
-        const collection_ref = collection(db, "slang");
+        const convertedSlang = this.slang.toUpperCase();
+        const collection_ref = collection(db, "convertedSlang");
         const data = await getDocs(
-          query(collection_ref, where("slang", "==", this.slang))
+          query(collection_ref, where("slang", "==", convertedSlang))
         );
         const datas = data.docs.map((doc) => {
           this.meaning = doc.data().meaning;
           return doc.data().meaning;
         });
         if (this.meaning === null) {
-          this.meaning = "Sorry no meaning for this slang yet or check the note guidelines for any wrong way of search";
+          this.meaning =
+            "Sorry no meaning for this slang yet or check the note guidelines for any wrong way of search";
         }
         this.show_spinner = !this.show_spinner;
       }
@@ -192,7 +200,7 @@ export default {
   font-size: 17px;
   width: 235px;
   height: 30px;
-  border-radius: 20px
+  border-radius: 20px;
 }
 .input:focus {
   outline: none;
@@ -353,7 +361,7 @@ export default {
   }
   .button {
     margin-top: 20px;
-    margin-left: 0
+    margin-left: 0;
   }
   .meaning-container {
     padding: 10px 10px;
