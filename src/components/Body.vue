@@ -80,6 +80,7 @@ export default {
         this.show_spinner = !this.show_spinner;
         this.meaning = null;
         const convertedSlang = this.slang.toUpperCase();
+        console.log(convertedSlang)
         const collection_ref = collection(db, "convertedSlang");
         const data = await getDocs(
           query(collection_ref, where("slang", "==", convertedSlang))
