@@ -79,9 +79,7 @@ export default {
       if (this.slang !== "") {
         this.show_spinner = !this.show_spinner;
         this.meaning = null;
-        console.log(this.slang)
         const convertedSlang = this.slang.toUpperCase();
-        console.log(convertedSlang)
         const collection_ref = collection(db, "slang");
         const data = await getDocs(
           query(collection_ref, where("slang", "==", convertedSlang))
