@@ -6,8 +6,8 @@
 
 <style>
 * {
-  background-color: #096a09;
-  margin: 0 
-  
+  background: #096a09;
+  margin: 0; 
+  padding: 0
 }
 </style>

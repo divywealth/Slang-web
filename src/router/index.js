@@ -21,6 +21,57 @@ const routes = [
     }
   }
   */
+  {
+    path: '/signin',
+    name: 'signin',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/Authentication/LoginView.vue')
+  },
+  {
+    path: '/signup',
+    name: 'signup',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/Authentication/Registration.vue')
+  },
+  {
+    path: '/getverificationcode',
+    name: 'GetVerificationCode',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/ForgetPassword/GetVerificationCode.vue')
+  },
+  {
+    path: '/verifycode',
+    name: 'VerifyCode',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/ForgetPassword/VerifyCode.vue')
+  },
+  {
+    path: '/changepassword',
+    name: 'ChangePassword',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/ForgetPassword/ChangePassword.vue')
+  },
+  {
+    path: "/:catchAll(.*)",
+    name: "NotFound",
+    component: () =>
+      import(/* webpackChunkName: "single-product" */ "../views/NotFound.vue"),
+  },
 ]
 
 const router = new VueRouter({

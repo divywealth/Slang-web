@@ -28,6 +28,10 @@
             Note: Slangs searched should start with capital letter so you get
             the meaning
           </p>
+          <p class="note">
+            -To add slang you have to sign in then your added slang will be reveiwed and approved.
+            You can add multiple slangs
+          </p>
         </div>
         <div class="slang-input-container">
           <div class="slanginput">
@@ -48,8 +52,10 @@
             </div>
           </div>
           <div class="meaning-container" v-if="meaning">
-            {{ meaning }}
+            <span>{{ meaning }}</span>
+            <span class="authur">-Authur</span>
           </div>
+          <div class="add-slang" @click="TOGGLEADDSLANGMODAL">Add Slang</div>
         </div>
       </div>
     </div>
@@ -95,6 +101,9 @@ export default {
         this.show_spinner = !this.show_spinner;
       }
     },
+    TOGGLEADDSLANGMODAL() {
+      this.$store.state.showAddSlangModal = true
+    }
   },
 };
 </script>
@@ -179,6 +188,9 @@ export default {
 }
 .slang-input-container {
   width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .meaning-container {
   background: white;
@@ -187,6 +199,15 @@ export default {
   border: 4px solid green;
   font-family: sans-serif;
   padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+}
+.meaning-container span {
+  background: none;
+}
+.authur {
+  margin-top: 15px;
+  text-align: end;
 }
 .search-icon {
   background: white;
@@ -210,9 +231,35 @@ export default {
   border: 2px solid #a6e3a6;
   border-radius: 50px;
   padding-left: 10px;
+  display: flex;
+  align-items: center;
+}
+.add-slang {
+  background-color: #48bb48;
+  box-sizing: border-box;
+  border: none;
+  width: 67%;
+  margin-top: 70px;
+  cursor: pointer;
+  padding: 15px 45px;
+  border-radius: 10px;
+  height: 53px;
+  display: flex;
+  color: white;
+  font-size: 15px;
+  font-family: sans-serif;
+  align-items: center;
+  justify-content: center;
+}
+.add-slang span {
+  color: white;
+  font-size: 15px;
+  font-family: sans-serif;
+  background: none;
 }
 .button {
   background-color: #48bb48;
+  width: 50%;
   border: none;
   margin-left: 20px;
   cursor: pointer;
@@ -355,9 +402,13 @@ export default {
     line-height: 2rem;
   }
   .slanginput {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .input {
+  }
+  .add-slang {
   }
   .button {
     margin-top: 20px;
