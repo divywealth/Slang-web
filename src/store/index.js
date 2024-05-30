@@ -7,9 +7,19 @@ export default new Vuex.Store({
   state: {
     showAddSlangModal: false,
     showProfileModal: false,
+    EditDetails: false,
+    ChangeUsername: false,
+    ChangeEmail: false,
+    ChangePassword: false,
+    ChangePhoneNo: false,
   },
   getters: {},
-  mutations: {},
+  mutations: {
+    CLOSEMODAL(state, payload) {
+      console.log(state[payload])
+      state[payload] = false;
+    }
+  },
   actions: {},
   modules: {},
 });

@@ -29,8 +29,8 @@
             the meaning
           </p>
           <p class="note">
-            -To add slang you have to sign in then your added slang will be reveiwed and approved.
-            You can add multiple slangs
+            -To add slang you have to sign in then your added slang will be
+            reveiwed and approved. You can add multiple slangs
           </p>
         </div>
         <div class="slang-input-container">
@@ -53,7 +53,23 @@
           </div>
           <div class="meaning-container" v-if="meaning">
             <span>{{ meaning }}</span>
-            <span class="authur">-Authur</span>
+            <span class="authur" v-if="gotData">-Authur</span>
+            <section class="reaction-section" v-if="gotData">
+              <div>
+                <font-awesome-icon icon="fa-solid fa-thumbs-up" class="icon" />
+                <span>2</span>
+              </div>
+              <div>
+                <font-awesome-icon
+                  icon="fa-solid fa-thumbs-down"
+                  class="icon"
+                />
+                <span>2</span>
+              </div>
+              <div>
+                <font-awesome-icon icon="fa-solid fa-flag" class="icon" />
+              </div>
+            </section>
           </div>
           <div class="add-slang" @click="TOGGLEADDSLANGMODAL">Add Slang</div>
         </div>
@@ -77,12 +93,14 @@ export default {
     return {
       slang: "",
       show_spinner: false,
+      gotData: false,
       meaning: null,
     };
   },
   methods: {
     async HANDLEGETSLANGMEANING() {
-      if (this.slang !== "") {
+      try {
+        if (this.slang !== "") {
         this.show_spinner = !this.show_spinner;
         this.meaning = null;
         const convertedSlang = this.slang.toUpperCase();
@@ -92,22 +110,30 @@ export default {
         );
         const datas = data.docs.map((doc) => {
           this.meaning = doc.data().meaning;
+          this.gotData = true
           return doc.data().meaning;
         });
-        if (this.meaning === null) {
+        if (datas.length === 0) {
+          this.gotData = false
           this.meaning =
             "Sorry no meaning for this slang yet or check the note guidelines for any wrong way of search";
         }
         this.show_spinner = !this.show_spinner;
       }
+      } catch (error) {
+        throw error.message
+      }
     },
     TOGGLEADDSLANGMODAL() {
-      this.$store.state.showAddSlangModal = true
-    }
+      this.$store.state.showAddSlangModal = true;
+    },
   },
 };
 </script>
 <style scoped>
+* {
+  background: none;
+}
 .main-body {
   padding: 2rem 2rem;
 }
@@ -275,6 +301,16 @@ export default {
   font-size: 15px;
   font-family: sans-serif;
   background: none;
+}
+.reaction-section {
+  display: flex;
+}
+.reaction-section div {
+  cursor: pointer;
+  margin: 0 20px 0 0;
+}
+.icon {
+  padding: 0 10px;
 }
 #chise {
   transform: rotate(2deg);
