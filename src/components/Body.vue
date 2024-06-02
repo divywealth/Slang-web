@@ -125,7 +125,7 @@ export default {
       }
     },
     TOGGLEADDSLANGMODAL() {
-      this.$store.state.showAddSlangModal = true;
+      this.$emit('CHANGESLANGMODAL')
     },
   },
 };

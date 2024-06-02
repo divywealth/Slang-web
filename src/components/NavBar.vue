@@ -9,13 +9,38 @@
           ><img alt="Not displaying" src="../assets/image/Github-Logo.png"
         /></a>
       </div>
-      <router-link to="/signin" class="signin-button">
+      <router-link to="/signin" class="signin-button" v-if="!user">
         <div>Signin</div>
       </router-link>
-      <img src="../assets/user-profile1.jpg" class="user-profile" @click="() => { this.$store.state.showProfileModal = true}"/>
+      <img src="../assets/user-profile1.jpg" class="user-profile" @click="GOTOPROFILE" v-if="user"/>
     </div>
   </div>
 </template>
+
+<script>
+import { mapState } from "vuex";
+export default {
+  name: "NavBar",
+  data() {
+    return {
+    }
+  },
+  methods: {
+    GOTOPROFILE() {
+      if (window.innerWidth > 1025) {
+        this.$emit('CHANGEPROFILE')
+      }else {
+        this.$router.push({
+          name: 'Profile'
+        })
+      }
+    }
+  },
+  computed: {
+    ...mapState(["user"])
+  }
+}
+</script>
 
 <style scoped>
 .navbar-main {
@@ -67,7 +92,7 @@
   margin-left: 20px;
   cursor: pointer;
 }
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1025px) {
   .navbar-logo {
     display: flex;
     flex-direction: column;

@@ -9,9 +9,18 @@ export const createUserApi = async (data) => {
   }
 };
 
+export const verifyUserApi = async () => {
+  try {
+    const response = await BEARER_HTTP.patch("v1/verify-user");
+    return response.data;
+  } catch (error) {
+    throw error.response.data.message;
+  }
+};
+
 export const loginUserApi = async (data) => {
   try {
-    let response = await BASIC_HTTP.post("v1/login", data);
+    const response = await BASIC_HTTP.post("v1/login", data);
     return response.data;
   } catch (error) {
     throw error.response.data.message;
@@ -20,7 +29,8 @@ export const loginUserApi = async (data) => {
 
 export const updatePasswordApi = async (data) => {
   try {
-    let response = await BEARER_HTTP.put("/v1/update-password", data);
+    const response = await BEARER_HTTP.put("/v1/update-password", data);
+    return response.data
   } catch (error) {
     throw error.response.data.message;
   }
@@ -28,7 +38,7 @@ export const updatePasswordApi = async (data) => {
 
 export const updateEmailApi = async (data) => {
   try {
-    let response = await BEARER_HTTP.put("/v1/update-email", data);
+    const response = await BEARER_HTTP.put("/v1/update-email", data);
   } catch (error) {
     throw error.response.data.message;
   }
@@ -36,19 +46,19 @@ export const updateEmailApi = async (data) => {
 
 export const updateProfilepicApi = async (data) => {
   try {
-    let response = await BEARER_HTTP.put("/v1/update-profilepic", data);
+    const response = await BEARER_HTTP.put("/v1/update-profilepic", data);
   } catch (error) {
     throw error.response.data.message;
   }
 };
 
 export const updateUsernameApi = async (data) => {
-    try {
-      let response = await BEARER_HTTP.put("/v1/update-username", data);
-    } catch (error) {
-      throw error.response.data.message;
-    }
-  };
+  try {
+    let response = await BEARER_HTTP.put("/v1/update-username", data);
+  } catch (error) {
+    throw error.response.data.message;
+  }
+};
 
 export const forgetPasswordApi = async (data) => {
   try {

@@ -5,33 +5,43 @@
     </div>
     <div class="form-section">
       <h1>Create an account</h1>
-      <form>
+      <form @submit.prevent="CREATEUSER">
         <label class="label">Firstname</label>
-        <input class="input" type="text" />
+        <input class="input" type="text" v-model="firstname" required />
 
         <label>Lastname</label>
-        <input class="input" type="text" />
+        <input class="input" type="text" v-model="lastname" required />
 
         <label>Username</label>
-        <input class="input" type="text" />
+        <input class="input" type="text" v-model="username" required />
 
         <label>email</label>
-        <input class="input" type="email" />
+        <input class="input" type="email" v-model="email" required />
 
         <label>Password</label>
-        <input class="input" type="password" />
+        <input class="input" type="password" v-model="password" required />
         <div v-if="errors.password" class="formError">
           {{ errors.password }}
         </div>
 
         <label>Confirm Password</label>
-        <input class="input" type="password" />
+        <input
+          class="input"
+          type="password"
+          v-model="confirmPassword"
+          required
+        />
         <div v-if="errors.confirmPassword" class="formError">
           {{ errors.confirmPassword }}
         </div>
 
         <div class="submitBox">
-          <button class="submit">Create an Account</button>
+          <button class="submit">
+            <span style="background: none" v-if="!loading"
+              >Create an Account</span
+            >
+            <Loading style="margin: 0 auto" v-if="loading" />
+          </button>
         </div>
 
         <div class="signin">
@@ -45,22 +55,76 @@
 </template>
 
 <script>
+import { SET_BEARER_HTTP } from "@/apis/axiosClient";
+import Loading from "../../components/Loading.vue";
+import { mapState } from "vuex";
 export default {
   name: "Registration",
-  components: {},
+  components: { Loading },
   data() {
     return {
+      loading: false,
+      firstname: "",
+      lastname: "",
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
       errors: {
         password: null,
         confirmPassword: null,
       },
     };
   },
+  methods: {
+    async CREATEUSER() {
+      try {
+        this.errors.password = null;
+        this.errors.confirmPassword = null;
+        if (this.password.length < 5) {
+          this.errors.password = "Password must be atleast 6 chars long";
+          this.loading = false;
+          return;
+        } else if (this.password !== this.confirmPassword) {
+          this.errors.confirmPassword =
+            "Confirm password must be same as password";
+          this.loading = false;
+          return;
+        }
+        this.loading = true;
+        const data = {
+          firstname: this.firstname,
+          lastname: this.lastname,
+          email: this.email,
+          username: this.username,
+          password: this.password,
+        };
+        console.log(data);
+        const response = await this.$store.dispatch("createUser", data)
+        console.log(response)
+        console.log(this.user)
+        if (response) {
+          this.loading = false;
+          SET_BEARER_HTTP();
+          this.$router.push({
+            name: "VerifyCode",
+          });
+        }
+      } catch (error) {
+        console.log(error)
+        throw error;
+      }
+    },
+  },
+  computed: {
+    ...mapState(["user", "token"]),
+  },
 };
 </script>
 
 <style scoped>
 .container {
+  background: #096a09;
   display: flex;
   height: 100vh;
 }
@@ -120,7 +184,10 @@ export default {
   background-color: #586;
   color: white;
   border: none;
-  padding: 10px 100px;
+  text-align: center;
+  width: 250px;
+  padding: 10px 0;
+  text-align: center;
   cursor: pointer;
   margin-top: 20px;
   font-family: sans-serif;
@@ -134,12 +201,12 @@ export default {
   font-size: 14px;
   letter-spacing: 1px;
 }
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1025px) {
   .container {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 40px
+    margin-top: 40px;
   }
   .image-section {
     flex: 0;
@@ -148,7 +215,7 @@ export default {
   .image-section img {
     height: 70px;
     width: 70px;
-    border-radius: 100%
+    border-radius: 100%;
   }
   .form-section {
     flex: 0;
@@ -156,7 +223,7 @@ export default {
   }
   .form-section form input {
     width: 100%;
-    box-sizing: border-box
+    box-sizing: border-box;
   }
 }
 </style>

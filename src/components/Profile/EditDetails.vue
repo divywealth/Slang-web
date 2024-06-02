@@ -47,6 +47,11 @@
 <script>
 export default {
   name: "EditDetails",
+  data() {
+    return {
+      
+    }
+  },
   methods: {
     GOTOPROFILE() {
       this.$store.state.EditDetails = false;

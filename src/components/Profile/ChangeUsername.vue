@@ -10,14 +10,15 @@
             @click="GOTOEDIT"
           />
         </div>
-        <div><h1>Change Username</h1></div>
+        <div><h1>CHANGE USERNAME</h1></div>
+        <span class="header-det">Fill in your new username</span>
         <div class="form-container">
           <form>
             <label> Username </label>
             <input type="text" v-model="username" />
 
             <div class="submitBox">
-              <button class="submit">Done</button>
+              <button class="submit">SUBMIT</button>
             </div>
           </form>
         </div>
@@ -26,22 +27,17 @@
 
     <!--For Android-->
     <section class="android-section">
-      <div class="icon-container">
-        <font-awesome-icon
-          icon="fa-solid fa-arrow-left"
-          style="cursor: pointer"
-          @click="GOTOEDIT"
-        />
-      </div>
+      <NavBar />
       <section class="android-body">
         <div><h1>CHANGE USERNAME</h1></div>
+        <span class="header-det">Fill in your new username</span>
         <div class="form-container">
           <form>
             <label> Username </label>
             <input type="text" v-model="username" />
 
             <div class="submitBox">
-              <button class="submit">Done</button>
+              <button class="submit">SUBMIT</button>
             </div>
           </form>
         </div>
@@ -51,8 +47,10 @@
 </template>
 
 <script>
+import NavBar from "../NavBar";
 export default {
   name: "ChangeUsername",
+  components: [NavBar],
   data() {
     return {
       username: "",
@@ -96,6 +94,14 @@ export default {
   overflow-y: auto;
   width: 600px;
   padding-bottom: 60px;
+}
+.header-det {
+  color: #000;
+  margin: 15px 0 5px 0;
+  font-size: 0.6em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
 }
 .icon-container {
   width: calc(100% - 20px);

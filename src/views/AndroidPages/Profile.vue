@@ -1,8 +1,7 @@
 <template>
   <main>
-    <section class="backdrop" @click.self="CLOSEMODAL">
-      <div class="modal">
-        <!--Profile-->
+    <section class="android-section">
+      <div class="android-modal">
         <div class="cover-photo"></div>
         <div class="user-details">
           <div class="image-container">
@@ -20,9 +19,8 @@
                 style="display: none"
               />
             </div>
-            <div class="add-photo"><span>Add photo</span></div>
           </div>
-          <span>{{ user.firstname}} {{ user.lastname }}</span>
+          <span>{{ user.firstname }} {{ user.lastname }}</span>
           <span>{{ user.username }}</span>
           <hr style="width: 100%; margin-top: 15px" />
           <div class="phone-section">
@@ -49,79 +47,21 @@
             <font-awesome-icon :icon="iconName" class="arrow-down" />
           </button>
         </div>
-
-        <!--Pending SLangs-->
-        <section v-if="pendingSlangs"></section>
-
-        <!--All SLangs-->
-        <section v-if="allSlangs"></section>
       </div>
     </section>
-
-    <!--Android Section-->
-    <section class="android-section">
-      <font-awesome-icon
-        icon="fa-solid fa-times"
-        style="margin: 10px 10px 20px 10px"
-        @click="CLOSEMODAL"
-      />
-      <div class="android-modal">
-        <div class="cover-photo"></div>
-        <div class="user-details">
-          <div class="image-container">
-            <img src="../../assets/user-profile1.jpg" class="user-icon" />
-            <div class="camera-container" @click="chooseFile">
-              <font-awesome-icon
-                icon="fa-solid fa-camera"
-                style="background: #48bb48"
-              /><input
-                type="file"
-                name="file"
-                ref="fileInput"
-                @change="handleFileChange"
-                accept="image/*"
-                style="display: none"
-              />
-            </div>
-          </div>
-          <span>{{ user.firstname}} {{ user.lastname }}</span>
-          <span>{{ user.username}}</span>
-          <hr style="width: 100%; margin-top: 15px" />
-          <div class="phone-section">
-            <span>Phone</span>
-            <span>+2349018317817</span>
-          </div>
-          <div class="phone-section">
-            <span>Email</span>
-            <span>{{user.email}}</span>
-          </div>
-          <hr style="width: 100%; margin-top: 15px" />
-        </div>
-        <div class="settings-container" @click="SHOWEDITDETAILS">
-          <font-awesome-icon icon="fa-solid fa-gear" />
-          <span>Edit Details</span>
-        </div>
-        <div class="slang-section">
-          <button @click="TOGGLEPENDINGSLANGS">
-            <span>Pending Slangs</span>
-            <font-awesome-icon :icon="iconName2" class="arrow-down" />
-          </button>
-          <button @click="TOGGLEALLSLANGS">
-            <span>All Slangs</span>
-            <font-awesome-icon :icon="iconName" class="arrow-down" />
-          </button>
-        </div>
-      </div>
-    </section>
+    <Footer />
   </main>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import NavBar from "../../components/NavBar.vue";
+import Footer from "../../components/Footer.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 export default {
-  name: "ProfileModal",
+  name: "Profile",
+  components: { NavBar, Footer },
   data() {
     return {
       filename: "",
@@ -141,19 +81,6 @@ export default {
       this.filename = event.target.files[0].name;
       console.log(this.filename);
     },
-    CLOSEMODAL() {
-      this.$emit('CLOSEMODAL')
-    },
-    SHOWEDITDETAILS() {
-      this.$store.state.showProfileModal = false;
-      this.$store.state.EditDetails = true;
-    },
-    TOGGLEPENDINGSLANGS() {
-      this.pendingSlangs = !this.pendingSlangs;
-    },
-    TOGGLEALLSLANGS() {
-      this.allSlangs = !this.allSlangs;
-    },
   },
   computed: {
     iconName2() {
@@ -162,38 +89,12 @@ export default {
     iconName() {
       return this.allSlangs ? faCaretDown : faCaretUp;
     },
-    ...mapState(["user"])
+    ...mapState(["user"]),
   },
-
 };
 </script>
 
-<style scoped>
-* {
-  background: #fff;
-  font-family: sans-serif;
-}
-.backdrop {
-  position: fixed;
-  background: rgb(0, 0, 0, 0.5);
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal {
-  background: #fff;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 80%; /* Set max-width as a percentage of viewport width */
-  max-height: 80%; /* Set max-height as a percentage of viewport height */
-  overflow-y: auto;
-  width: 600px;
-}
+<style>
 .image-container {
   position: relative;
 }
@@ -226,7 +127,7 @@ export default {
 }
 .cover-photo {
   height: 100px;
-  background: #808080;
+  background: #096a09;
   width: 100%;
 }
 .user-details {
@@ -295,9 +196,42 @@ export default {
   align-items: center;
 }
 @media only screen and (max-width: 1025px) {
-  .backdrop {
-    display: none;
+  .android-section {
+    display: block;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    left: 0;
   }
+  .slang-section {
+    width: calc(100% - 70px);
+    display: flex;
+    justify-content: space-between;
+    margin: 30px 0;
+  }
+  .slang-section button {
+    background-color: #48bb48;
+    width: 40%;
+    white-space: nowrap;
+    border: none;
+    margin-left: 20px;
+    cursor: pointer;
+    padding: 20px 0;
+    border-radius: 10px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .slang-section button span {
+    color: black;
+    background: none;
+    margin-right: 10px;
+  }
+}
+@media only screen and (max-width: 900px) {
   .android-section {
     display: block;
     position: fixed;

@@ -7,13 +7,13 @@ export const BASIC_HTTP = axios.create({
 });
 
 export let BEARER_HTTP = axios.create({
-  baseURL: "",
+  baseURL: "http://localhost:3000",
   timeout: 10000,
   headers: { Authorization: `Bearer` },
 });
 export const SET_BEARER_HTTP = () => {
   BEARER_HTTP = axios.create({
-    baseURL: "",
+    baseURL: "http://localhost:3000",
     timeout: 10000,
     headers: { Authorization: `Bearer ${store.state.token}` },
   });

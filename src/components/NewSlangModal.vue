@@ -5,11 +5,7 @@
         <font-awesome-icon
           icon="fa-solid fa-times"
           style="cursor: pointer; color: white"
-          @click="
-            () => {
-              this.$store.state.showAddSlangModal = false;
-            }
-          "
+          @click="CLOSEMODAL"
         />
       </div>
       <div class="form-modal">
@@ -54,6 +50,9 @@ export default {
     ADDTOSLANG() {
       this.$store.state.showAddSlangModal = false;
     },
+    CLOSEMODAL() {
+      this.$emit("CLOSESLANGMODAL")
+    }
   },
 };
 </script>

@@ -5,15 +5,15 @@
     </div>
     <div class="form-section">
       <h1>Welcome back</h1>
-      <form>
-        <label>Username</label>
-        <input />
-        <div v-if="errors.username" class="formError">
-          {{ errors.username }}
+      <form @submit.prevent="SIGNINUSER">
+        <label>Email</label>
+        <input type="email" v-model="email" required/>
+        <div v-if="errors.email" class="formError">
+          {{ errors.email }}
         </div>
 
         <label>Password</label>
-        <input />
+        <input type="password" v-model="password" required/>
         <div v-if="errors.password" class="formError">
           {{ errors.password }}
         </div>
@@ -30,7 +30,10 @@
         </div>
 
         <div class="submitBox">
-          <button class="submit">Sign In</button>
+          <button class="submit">
+            <span style="background: none" v-if="!loading" >Sign In</span>
+            <Loading style="margin: 0 auto" v-if="loading" />
+          </button>
         </div>
 
         <div class="signUp">
@@ -43,22 +46,64 @@
   </div>
 </template>
 <script>
+import { SET_BEARER_HTTP } from "@/apis/axiosClient";
+import Loading from "../../components/Loading.vue";
+import { mapState } from "vuex";
 export default {
   name: "LoginView",
-  components: {},
+  components: {Loading},
   data() {
     return {
+      loading: false,
+      email: "",
+      password: "",
       errors: {
-        username: null,
+        email: null,
         password: null,
       },
     };
   },
+  methods: {
+    async SIGNINUSER() {
+      try {
+        this.loading = true;
+        const data = {
+          email: this.email,
+          password: this.password
+        }
+        SET_BEARER_HTTP()
+        const response = await this.$store.dispatch("loginUser", data)
+        console.log(response)
+        if(response) {
+          this.loading = false;
+          await this.$router.push({
+            name: "home",
+          });
+          SET_BEARER_HTTP()
+        }
+      } catch (error) {
+        this.errors.email = null;
+        this.errors.password = null;
+        if(error == "email dosent have an account try signing up") {
+          this.loading = false;
+          this.errors.email = error;
+        }else if (error == "Wrong Password") {
+          this.loading = false;
+          this.errors.password = error;
+        }else if (error == "User has not verified email") {
+          this.$router.push({
+            name: "VerifyCode"
+          })
+        }
+      }
+    }
+  }
 };
 </script>
 
 <style scoped>
 .container {
+  background: #096a09;
   display: flex;
   height: 100vh;
 }
@@ -147,7 +192,7 @@ export default {
   font-size: 14px;
   letter-spacing: 1px;
 }
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1025px) {
   .container {
     flex-direction: column;
     align-items: center;

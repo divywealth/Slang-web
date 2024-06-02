@@ -24,6 +24,7 @@ export default {
 
 <style scoped>
 .container {
+  background: #096a09;
   display: flex;
   height: 100vh;
 }
@@ -86,7 +87,7 @@ export default {
   margin-top: 20px;
   font-family: sans-serif;
 }
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1025px) {
   .container {
     flex-direction: column;
     align-items: center;
