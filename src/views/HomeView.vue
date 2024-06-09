@@ -6,6 +6,7 @@
       v-if="showAddSlangModal"
       class="new-slang-modal"
       @CLOSESLANGMODAL="TOGGLESLANGMODAL"
+      @CLOSESLANGMODALSUCESS="TOGGLESLANGSUCESS"
     />
     <ProfileModal v-if="showProfileModal" @CLOSEMODAL="TOGGLEPROFILE"/>
     <!-- <EditDetails v-if="this.$store.state.EditDetails" />
@@ -20,6 +21,7 @@
 <script>
 // @ is an alias to /src
 import Loading from "../components/Loading.vue";
+import { SET_BEARER_HTTP } from "@/apis/axiosClient";
 import { mapState } from "vuex";
 import NavBar from "../components/NavBar.vue";
 import Body from "../components/Body.vue";
@@ -32,7 +34,7 @@ import ChangeEmail from "../components/Profile/ChangeEmail";
 import ChangePassword from "../components/Profile/ChangePassword";
 import ChangePhoneNo from "../components/Profile/ChangePhoneNo";
 export default {
-  name: "HomeView",
+  name: "home",
   components: {
     NavBar,
     Body,
@@ -52,12 +54,26 @@ export default {
       showProfileModal: false,
     };
   },
+  mounted() {
+    SET_BEARER_HTTP()
+  },
   methods: {
     TOGGLEPROFILE() {
       this.showProfileModal = !this.showProfileModal;
     },
     TOGGLESLANGMODAL() {
       this.showAddSlangModal = !this.showAddSlangModal
+    },
+    TOGGLESLANGSUCESS() {
+      this.showAddSlangModal = !this.showAddSlangModal;
+      this.$toast.open({
+        message: 'Slang added successfully. Thanks',
+        type: 'success', // You can use 'success', 'info', 'error', or 'warning'
+        // Additional options
+        duration: 5000, // Duration in milliseconds
+        dismissible: true, // Whether the toast can be dismissed
+        position: 'top', // Position of the toast
+      });
     }
   },
   computed: {
@@ -83,6 +99,7 @@ export default {
 }
 @media only screen and (max-width: 500px) {
   .home {
+    height: 100%;
   }
   .new-slang-modal {
     display: none;

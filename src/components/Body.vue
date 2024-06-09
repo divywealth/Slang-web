@@ -35,40 +35,54 @@
         </div>
         <div class="slang-input-container">
           <div class="slanginput">
-            <div class="input-section">
-              <font-awesome-icon
-                icon="fa-solid fa-search"
-                class="search-icon"
-              />
-              <input
-                placeholder="Search slang full meaning..."
-                class="input"
-                v-model="slang"
-              />
+            <div>
+              <div class="input-section">
+                <font-awesome-icon
+                  icon="fa-solid fa-search"
+                  class="search-icon"
+                />
+                <input
+                  placeholder="Search slang full meaning..."
+                  class="input"
+                  v-model="slang"
+                />
+              </div>
+              <div v-if="slangError" class="formError">
+                {{ slangError }}
+              </div>
             </div>
             <div class="button" @click="HANDLEGETSLANGMEANING">
               <span v-if="!show_spinner">Search</span>
               <div class="load_spinner" v-if="show_spinner"></div>
             </div>
           </div>
-          <div class="meaning-container" v-if="meaning">
-            <span>{{ meaning }}</span>
-            <span class="authur" v-if="gotData">-Authur</span>
-            <section class="reaction-section" v-if="gotData">
+          <div class="meaning-container" v-if="slangDetails">
+            <span>{{ slangDetails.meaning }}</span>
+            <span class="authur">-{{ slangDetails.user.username }}</span>
+            <section class="reaction-section">
               <div>
-                <font-awesome-icon icon="fa-solid fa-thumbs-up" class="icon" />
-                <span>2</span>
+                <font-awesome-icon icon="fa-solid fa-thumbs-up" class="icon" @click="REACTTOSLANG("Like")" v-if="!liked"/>
+                <font-awesome-icon icon="fa-solid fa-thumbs-up" class="icon" @click="REACTTOSLANG("Like")" v-if="liked"/>
+                <span>{{likes}}</span>
               </div>
               <div>
                 <font-awesome-icon
                   icon="fa-solid fa-thumbs-down"
                   class="icon"
+                  @click="REACTTOSLANG("Dislike")"
+                  v-if="!disliked"
                 />
-                <span>2</span>
+                <font-awesome-icon
+                  icon="fa-solid fa-thumbs-down"
+                  class="icon"
+                  @click="REACTTOSLANG("Dislike")"
+                  v-if="disliked"
+                />
+                <span>{{dislikes}}</span>
               </div>
-              <div>
+              <!-- <div>
                 <font-awesome-icon icon="fa-solid fa-flag" class="icon" />
-              </div>
+              </div> -->
             </section>
           </div>
           <div class="add-slang" @click="TOGGLEADDSLANGMODAL">Add Slang</div>
@@ -78,15 +92,7 @@
   </main>
 </template>
 <script>
-import db from "../firebase-config";
-import {
-  where,
-  doc,
-  collection,
-  addDoc,
-  getDocs,
-  query,
-} from "firebase/firestore";
+import { mapState } from "vuex";
 export default {
   name: "Body",
   data() {
@@ -95,38 +101,96 @@ export default {
       show_spinner: false,
       gotData: false,
       meaning: null,
+      slangDetails: null,
+      slangError: null,
+      liked: false,
+      disliked: false,
+      likes: null,
+      dislikes: null
     };
   },
   methods: {
     async HANDLEGETSLANGMEANING() {
       try {
-        if (this.slang !== "") {
-        this.show_spinner = !this.show_spinner;
-        this.meaning = null;
+        this.show_spinner = true;
+        this.slangError = null;
         const convertedSlang = this.slang.toUpperCase();
-        const collection_ref = collection(db, "slang");
-        const data = await getDocs(
-          query(collection_ref, where("slang", "==", convertedSlang))
-        );
-        const datas = data.docs.map((doc) => {
-          this.meaning = doc.data().meaning;
-          this.gotData = true
-          return doc.data().meaning;
-        });
-        if (datas.length === 0) {
-          this.gotData = false
-          this.meaning =
-            "Sorry no meaning for this slang yet or check the note guidelines for any wrong way of search";
-        }
-        this.show_spinner = !this.show_spinner;
-      }
+        const data = {
+          slang: convertedSlang,
+        };
+        const response = await this.$store.dispatch("getSlang", data);
+        this.show_spinner = false;
+        this.slangDetails = response;
+        console.log(response.user.username);
       } catch (error) {
-        throw error.message
+        if (
+          error ==
+          "Slang not available you can try adding the slang if you know the meaning"
+        ) {
+          this.slangError = error;
+        }
+        this.show_spinner = false;
+        throw error;
       }
     },
     TOGGLEADDSLANGMODAL() {
-      this.$emit('CHANGESLANGMODAL')
+      if (this.user) {
+        if (window.innerWidth > 1025) {
+          this.$emit("CHANGESLANGMODAL");
+        }else {
+          this.$router.push({
+            name: "AddSlang"
+          })
+        }
+      } else {
+        this.$toast.open({
+          message: "You need to Sign in before adding a slang",
+          type: "info", // You can use 'success', 'info', 'error', or 'warning'
+          // Additional options
+          duration: 5000, // Duration in milliseconds
+          dismissible: true, // Whether the toast can be dismissed
+          position: "top", // Position of the toast
+        });
+      }
     },
+    async REACTTOSLANG(reaction) {
+      try {
+        const data = {
+          slang: this.slangDetails.id,
+          react: reaction
+        }
+        const response = await this.$store.dispatch("createReaction", data)
+        if(response) {
+          GETSLANGREACTIONS()
+        }
+      } catch (error) {
+        throw error
+      }
+    },
+    async GETSLANGREACTIONS () {
+      try {
+        const likes = await this.$store.dispatch("getSlangLikes");
+        console.log(likes, likes.length)
+        this.likes = likes.length;
+        const dislikes = await this.$store.dispatch("getSlangDislikes");
+        console.log(dislikes, dislikes.length)
+        this.dislikes = dislikes.length
+      } catch (error) {
+        throw error
+      }
+    },
+    // async GETSLANGDISLIKES() {
+    //   try {
+    //     const response = await this.$store.dispatch("getSlangDislikes");
+    //     console.log(response, response.length)
+    //     this.dislikes = response.length
+    //   } catch (error) {
+    //     throw error
+    //   }
+    // }
+  },
+  computed: {
+    ...mapState(["user", "token"]),
   },
 };
 </script>
@@ -165,7 +229,13 @@ export default {
   display: flex;
   justify-content: center;
 }
-
+.formError {
+  color: #ff0050;
+  font-size: 0.8em;
+  font-weight: bold;
+  margin-top: 10px;
+  font-family: sans-serif;
+}
 .slang-display-box {
   border: 3px solid #a6e3a6;
   margin: 25px 20px;

@@ -7,18 +7,74 @@
     <div class="form-section">
       <h1>FORGOT PASSWORD?</h1>
       <p>Please enter your email</p>
-      <form>
+      <form @submit.prevent="SENDCODE">
         <label>Email</label>
-        <input placeholder="Fill in your email" />
-        <div class="submitBox"><button>NEXT</button></div>
+        <input
+          placeholder="Fill in your email"
+          v-model="email"
+          type="email"
+          required
+        />
+        <div class="submitBox">
+          <button>
+            <span style="background: none" v-if="!loading">NEXT</span>
+            <Loading style="margin: 0 auto" v-if="loading" />
+          </button>
+        </div>
       </form>
     </div>
   </div>
 </template>
 
 <script>
+import Loading from "../../components/Loading.vue";
 export default {
   name: "GetVerificationCode",
+  components: { Loading },
+  data() {
+    return {
+      email: null,
+      loading: false
+    };
+  },
+  methods: {
+    async SENDCODE() {
+      try {
+        this.loading = true
+        const data = {
+          email: this.email,
+        };
+        const response = await this.$store.dispatch("sendCodePassword", data);
+        this.loading = false
+        if (response) {
+          this.$toast.open({
+            message: "code sent to email",
+            type: "success", // You can use 'success', 'info', 'error', or 'warning'
+            // Additional options
+            duration: 5000, // Duration in milliseconds
+            dismissible: true, // Whether the toast can be dismissed
+            position: "top", // Position of the toast
+          });
+          this.$router.push({
+            name: "VerifyCode"
+          })
+        }
+      } catch (error) {
+        if (error == "email dosen't have an account") {
+          this.$toast.open({
+            message: error,
+            type: "error", // You can use 'success', 'info', 'error', or 'warning'
+            // Additional options
+            duration: 5000, // Duration in milliseconds
+            dismissible: true, // Whether the toast can be dismissed
+            position: "top", // Position of the toast
+          });
+        }
+        this.loading = false
+        throw error;
+      }
+    },
+  },
 };
 </script>
 
@@ -92,7 +148,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 40px
+    margin-top: 40px;
   }
   .image-section {
     flex: 0;
@@ -101,17 +157,17 @@ export default {
   .image-section img {
     height: 70px;
     width: 70px;
-    border-radius: 100%
+    border-radius: 100%;
   }
   .form-section {
     flex: 0;
   }
   .form-section h1 {
-    font-size: 28px
+    font-size: 28px;
   }
   .form-section form input {
     width: 100%;
-    box-sizing: border-box
+    box-sizing: border-box;
   }
 }
 </style>

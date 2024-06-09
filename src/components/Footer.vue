@@ -31,6 +31,13 @@
   .main-footer-container span {
     font-size: 13px;
   }
+  .main-footer-container {
+    background: #096a09;
+    position: static;
+    bottom: 0;
+    width: 100%;
+    padding: 30px 0;
+  }
 }
 
 </style>

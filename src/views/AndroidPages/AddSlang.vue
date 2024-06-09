@@ -1,17 +1,11 @@
 <template>
-  <div class="backdrop">
+  <main>
+    <NavBar />
     <div class="modal">
-      <div class="cancel-container">
-        <font-awesome-icon
-          icon="fa-solid fa-times"
-          style="cursor: pointer; color: white"
-          @click="CLOSEMODAL"
-        />
-      </div>
       <div class="form-modal">
         <h1>Add Slang</h1>
         <form @submit.prevent="ADDTOSLANG">
-          <div>
+          <div class="input-container">
             <label>Slang</label>
             <input type="text" v-model="slang" required />
             <div v-if="slangError" class="formError">
@@ -41,14 +35,17 @@
         </form>
       </div>
     </div>
-  </div>
+    <Footer />
+  </main>
 </template>
 
 <script>
-import Loading from "../components/Loading.vue";
+import NavBar from "../../components/NavBar.vue";
+import Footer from "../../components/Footer.vue";
+import Loading from "../../components/Loading.vue";
 export default {
-  name: "NewSlangModal",
-  components: { Loading },
+  name: "AddSlang",
+  components: { Loading, Footer, NavBar },
   data() {
     return {
       isScrollable: false,
@@ -70,7 +67,17 @@ export default {
         const response = await this.$store.dispatch("createSlang", data);
         this.isLoading = false;
         if (response) {
-          this.$emit("CLOSESLANGMODALSUCESS");
+          this.$router.push({
+            name: "home",
+          });
+          this.$toast.open({
+            message: "Slang added successfully. Thanks",
+            type: "success", // You can use 'success', 'info', 'error', or 'warning'
+            // Additional options
+            duration: 5000, // Duration in milliseconds
+            dismissible: true, // Whether the toast can be dismissed
+            position: "top", // Position of the toast
+          });
           return response;
         }
       } catch (error) {
@@ -81,45 +88,24 @@ export default {
         throw error;
       }
     },
-    CLOSEMODAL() {
-      this.$emit("CLOSESLANGMODAL");
-    },
   },
 };
 </script>
 
-<style scoped>
-* {
-  background: #808080;
-}
-.backdrop {
-  position: fixed;
-  background: rgb(0, 0, 0, 0.5);
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center; /* Enable scrolling */
-}
+<style>
 .modal {
   background: #808080;
-  border-radius: 10px;
-  padding: 10px 20px 40px 40px;
-  transform: translate(-50%, -50%);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  max-width: 80%; /* Set max-width as a percentage of viewport width */
-  max-height: 80%; /* Set max-height as a percentage of viewport height */
-  overflow-y: auto;
+  padding: 0 20px 0 20px;
+  height: 77vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .form-modal {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-right: 20px;
 }
 .form-modal h1 {
   color: white;
@@ -128,12 +114,12 @@ export default {
 .form-modal form {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: center;
 }
 .form-modal form label {
   color: white;
   display: inline-block;
-  margin: 20px 0 15px;
+  margin: 20px 0 15px 0;
   font-size: 0.6em;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -143,11 +129,12 @@ export default {
 .form-modal form textarea {
   display: block;
   padding: 10px 6px;
-  width: 400px;
+  width: 100%;
   border-radius: 5px;
   border: 1px solid #b4b4b8;
   outline: none;
   color: #283d3f;
+  box-sizing: border-box;
   background: #e0e0e4;
 }
 .submitBox {
@@ -186,5 +173,7 @@ export default {
   font-weight: bold;
   margin-top: 10px;
   font-family: sans-serif;
+}
+.input-container {
 }
 </style>

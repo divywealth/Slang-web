@@ -39,6 +39,7 @@ export const updatePasswordApi = async (data) => {
 export const updateEmailApi = async (data) => {
   try {
     const response = await BEARER_HTTP.put("/v1/update-email", data);
+    return response.data;
   } catch (error) {
     throw error.response.data.message;
   }
@@ -46,7 +47,8 @@ export const updateEmailApi = async (data) => {
 
 export const updateProfilepicApi = async (data) => {
   try {
-    const response = await BEARER_HTTP.put("/v1/update-profilepic", data);
+    const response = await BEARER_HTTP.patch("/v1/update-profilepic", data);
+    return response.data;
   } catch (error) {
     throw error.response.data.message;
   }
@@ -55,14 +57,16 @@ export const updateProfilepicApi = async (data) => {
 export const updateUsernameApi = async (data) => {
   try {
     let response = await BEARER_HTTP.put("/v1/update-username", data);
+    return response.data;
   } catch (error) {
     throw error.response.data.message;
   }
 };
 
-export const forgetPasswordApi = async (data) => {
+export const resetPasswordApi = async (data) => {
   try {
     let response = await BASIC_HTTP.put("/v1/reset-password", data);
+    return response.data;
   } catch (error) {
     throw error.response.data.message;
   }

@@ -102,7 +102,7 @@ export default {
         console.log(data);
         const response = await this.$store.dispatch("createUser", data)
         console.log(response)
-        console.log(this.user)
+        console.log(this.token)
         if (response) {
           this.loading = false;
           SET_BEARER_HTTP();

@@ -9,9 +9,17 @@
       <p>Create a new password</p>
       <form>
         <label>Password</label>
-        <input placeholder="New Password" />
+        <input
+          placeholder="New Password"
+          v-model="password"
+          type="password"
+          required
+        />
         <div class="submitBox">
-          <button @click="changePassword">Done</button>
+          <button @click="changePassword">
+            <span style="background: none" v-if="!loading">SUBMIT</span>
+            <Loading style="margin: 0 auto" v-if="loading" />
+          </button>
         </div>
       </form>
     </div>
@@ -19,8 +27,47 @@
 </template>
 
 <script>
+import { SET_BEARER_HTTP } from "@/apis/axiosClient";
+import Loading from "../../components/Loading.vue";
+import { mapState } from "vuex";
 export default {
   name: "ChangePassword",
+  components: { Loading },
+  data() {
+    return {
+      password: null,
+      loading: false,
+    };
+  },
+  methods: {
+    async CHANGEPASSWORD() {
+      try {
+        const data = {
+          email: tempUser.email,
+          password: this.password,
+        };
+        const response = await this.$store.dispatch("resetPassword", data);
+        if (response) {
+          this.$toast.open({
+            message: "Password updated successfully",
+            type: "success", // You can use 'success', 'info', 'error', or 'warning'
+            // Additional options
+            duration: 5000, // Duration in milliseconds
+            dismissible: true, // Whether the toast can be dismissed
+            position: "top", // Position of the toast
+          });
+          this.$router.push({
+            name: "signin"
+          })
+        }
+      } catch (error) {
+        throw error;
+      }
+    },
+  },
+  computed: {
+    ...mapState(["tempUser", "token"]),
+  },
 };
 </script>
 
@@ -94,7 +141,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 40px
+    margin-top: 40px;
   }
   .image-section {
     flex: 0;
@@ -103,17 +150,17 @@ export default {
   .image-section img {
     height: 70px;
     width: 70px;
-    border-radius: 100%
+    border-radius: 100%;
   }
   .form-section {
     flex: 0;
   }
   .form-section h1 {
-    font-size: 28px
+    font-size: 28px;
   }
   .form-section form input {
     width: 100%;
-    box-sizing: border-box
+    box-sizing: border-box;
   }
 }
 </style>

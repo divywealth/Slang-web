@@ -7,13 +7,13 @@
       <h1>Welcome back</h1>
       <form @submit.prevent="SIGNINUSER">
         <label>Email</label>
-        <input type="email" v-model="email" required/>
+        <input type="email" v-model="email" required />
         <div v-if="errors.email" class="formError">
           {{ errors.email }}
         </div>
 
         <label>Password</label>
-        <input type="password" v-model="password" required/>
+        <input type="password" v-model="password" required />
         <div v-if="errors.password" class="formError">
           {{ errors.password }}
         </div>
@@ -24,14 +24,14 @@
             <label>Remember Me</label>
           </section>
 
-          <router-link to="" id="Password"
+          <router-link to="/getverificationcode" id="Password"
             ><span>Forgot Password</span></router-link
           >
         </div>
 
         <div class="submitBox">
           <button class="submit">
-            <span style="background: none" v-if="!loading" >Sign In</span>
+            <span style="background: none" v-if="!loading">Sign In</span>
             <Loading style="margin: 0 auto" v-if="loading" />
           </button>
         </div>
@@ -40,7 +40,6 @@
           Dont have an account?
           <router-link to="/signup" class="signUp">Sign up</router-link>
         </div>
-
       </form>
     </div>
   </div>
@@ -51,7 +50,7 @@ import Loading from "../../components/Loading.vue";
 import { mapState } from "vuex";
 export default {
   name: "LoginView",
-  components: {Loading},
+  components: { Loading },
   data() {
     return {
       loading: false,
@@ -69,35 +68,35 @@ export default {
         this.loading = true;
         const data = {
           email: this.email,
-          password: this.password
-        }
-        SET_BEARER_HTTP()
-        const response = await this.$store.dispatch("loginUser", data)
-        console.log(response)
-        if(response) {
+          password: this.password,
+        };
+        SET_BEARER_HTTP();
+        const response = await this.$store.dispatch("loginUser", data);
+        console.log(response);
+        if (this.user == null) {
+          this.$router.push({
+            name: "VerifyCode",
+          });
+        } else {
           this.loading = false;
           await this.$router.push({
             name: "home",
           });
-          SET_BEARER_HTTP()
         }
       } catch (error) {
         this.errors.email = null;
         this.errors.password = null;
-        if(error == "email dosent have an account try signing up") {
+        if (error == "email dosent have an account try signing up") {
           this.loading = false;
           this.errors.email = error;
-        }else if (error == "Wrong Password") {
+        } else if (error == "Wrong Password") {
           this.loading = false;
           this.errors.password = error;
-        }else if (error == "User has not verified email") {
-          this.$router.push({
-            name: "VerifyCode"
-          })
         }
+        this.loading = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -179,10 +178,14 @@ export default {
   background-color: #586;
   color: white;
   border: none;
-  padding: 10px 150px;
+  text-align: center;
+  width: 250px;
+  padding: 10px 0;
+  text-align: center;
   cursor: pointer;
   margin-top: 20px;
   font-family: sans-serif;
+  white-space: nowrap;
 }
 .signUp {
   text-decoration: none;
@@ -197,7 +200,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 40px
+    margin-top: 40px;
   }
   .image-section {
     flex: 0;
@@ -206,14 +209,14 @@ export default {
   .image-section img {
     height: 70px;
     width: 70px;
-    border-radius: 100%
+    border-radius: 100%;
   }
   .form-section {
     flex: 0;
   }
   .form-section form input {
     width: 100%;
-    box-sizing: border-box
+    box-sizing: border-box;
   }
 }
 </style>

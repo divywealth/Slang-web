@@ -2,7 +2,7 @@ import { BASIC_HTTP, BEARER_HTTP } from "./axiosClient";
 
 export const verifyCodeApi = async (data) => {
   try {
-    const response = await BEARER_HTTP.post("/v1/verify-code", data);
+    const response = await BASIC_HTTP.post("/v1/verify-code", data);
     return response.data;
   } catch (error) {
     throw error.response.data.message;

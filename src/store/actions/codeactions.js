@@ -1,4 +1,4 @@
-import { sendCodeEmailApi, verifyCodeApi } from "@/apis/codeApis";
+import { sendCodeEmailApi, sendCodePasswordApi, verifyCodeApi } from "@/apis/codeApis";
 
 export const codeActions = {
   async verifyCode({ commit }, data) {
@@ -13,7 +13,6 @@ export const codeActions = {
 
   async sendCodeEmail({ commit }, data) {
     try {
-      console.log(data);
       const response = await sendCodeEmailApi(data);
       return response;
     } catch (error) {
@@ -21,8 +20,11 @@ export const codeActions = {
     }
   },
 
-  async sendCodePassword() {
+  async sendCodePassword({ commit }, data) {
     try {
+      const response = await sendCodePasswordApi(data);
+      commit("SETTEMPUSER", response.user)
+      return response
     } catch (error) {
       throw error;
     }

@@ -12,7 +12,12 @@
       <router-link to="/signin" class="signin-button" v-if="!user">
         <div>Signin</div>
       </router-link>
-      <img src="../assets/user-profile1.jpg" class="user-profile" @click="GOTOPROFILE" v-if="user"/>
+      <img
+        src="../assets/user-profile1.jpg"
+        class="user-profile"
+        @click="GOTOPROFILE"
+        v-if="user"
+      />
     </div>
   </div>
 </template>
@@ -22,24 +27,34 @@ import { mapState } from "vuex";
 export default {
   name: "NavBar",
   data() {
-    return {
-    }
+    return {};
   },
   methods: {
     GOTOPROFILE() {
-      if (window.innerWidth > 1025) {
-        this.$emit('CHANGEPROFILE')
-      }else {
-        this.$router.push({
-          name: 'Profile'
-        })
+      if (user) {
+        if (window.innerWidth > 1025) {
+          this.$emit("CHANGEPROFILE");
+        } else {
+          this.$router.push({
+            name: "Profile",
+          });
+        }
+      } else {
+        this.$toast.open({
+          message: "Sign in before you can see a profile",
+          type: "warning", // You can use 'success', 'info', 'error', or 'warning'
+          // Additional options
+          duration: 5000, // Duration in milliseconds
+          dismissible: true, // Whether the toast can be dismissed
+          position: "top", // Position of the toast
+        });
       }
-    }
+    },
   },
   computed: {
-    ...mapState(["user"])
-  }
-}
+    ...mapState(["user"]),
+  },
+};
 </script>
 
 <style scoped>
@@ -85,7 +100,7 @@ export default {
   cursor: pointer;
   color: #a6e3a6;
 }
-.user-profile {   
+.user-profile {
   width: 40px;
   height: 40px;
   border-radius: 100%;
@@ -96,7 +111,7 @@ export default {
   .navbar-logo {
     display: flex;
     flex-direction: column;
-    justify-content: center
+    justify-content: center;
   }
   .navbar-logo img {
     height: 50px;

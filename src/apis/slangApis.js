@@ -1,37 +1,46 @@
 import { BASIC_HTTP, BEARER_HTTP } from "./axiosClient";
 
-export const createSlang = async (data) => {
+export const createSlangApi = async (data) => {
   try {
     const response = await BEARER_HTTP.post("v1/slang", data);
     return response.data;
   } catch (error) {
-    throw error.message;
+    throw error.response.data.message;
   }
 };
 
-export const updateSlang = async (data) => {
-    try {
-      const response = await BASIC_HTTP.patch("v1/slang/:id", data);
-      return response.data;
-    } catch (error) {
-      throw error.message;
-    }
-  };
+export const updateSlangApi = async (data) => {
+  try {
+    const response = await BASIC_HTTP.patch("v1/slang/:id", data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data.message;
+  }
+};
 
-export const getUserApprovedSlang = async () => {
+export const getSlangApi = async (data) => {
+  try {
+    const response = await BASIC_HTTP.post("v1/getslang", data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data.message;
+  }
+}
+
+export const getUserApprovedSlangApi = async () => {
   try {
     const response = await BEARER_HTTP.get("v1/users/:userId/approvedslangs");
     return response.data;
   } catch (error) {
-    throw error.message;
+    throw error.response.data.message;
   }
 };
 
-export const getUserPendingSlang = async () => {
+export const getUserPendingSlangApi = async () => {
   try {
     const response = await BEARER_HTTP.get("v1/users/:userId/pendingslangs");
     return response.data;
   } catch (error) {
-    throw error.message;
+    throw error.response.data.message;
   }
 };

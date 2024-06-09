@@ -1,14 +1,15 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import store from "../store/index.js";
+import HomeView from "../views/HomeView.vue";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: "/",
+    name: "home",
+    component: HomeView,
   },
   /*{
     path: '/about',
@@ -22,58 +23,83 @@ const routes = [
   }
   */
   {
-    path: '/signin',
-    name: 'signin',
+    path: "/signin",
+    name: "signin",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/Authentication/LoginView.vue')
+      import(
+        /* webpackChunkName: "about" */ "../views/Authentication/LoginView.vue"
+      ),
+    meta: { noAuth: true },
   },
   {
-    path: '/signup',
-    name: 'signup',
+    path: "/signup",
+    name: "signup",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/Authentication/Registration.vue')
+      import(
+        /* webpackChunkName: "about" */ "../views/Authentication/Registration.vue"
+      ),
+    meta: { noAuth: true },
   },
   {
-    path: '/getverificationcode',
-    name: 'GetVerificationCode',
+    path: "/getverificationcode",
+    name: "GetVerificationCode",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/ForgetPassword/GetVerificationCode.vue')
+      import(
+        /* webpackChunkName: "about" */ "../views/ForgetPassword/GetVerificationCode.vue"
+      ),
   },
   {
-    path: '/verifycode',
-    name: 'VerifyCode',
+    path: "/verifycode",
+    name: "VerifyCode",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/ForgetPassword/VerifyCode.vue')
+      import(
+        /* webpackChunkName: "about" */ "../views/ForgetPassword/VerifyCode.vue"
+      ),
+      meta: { noAuth: true },
   },
   {
-    path: '/changepassword',
-    name: 'ChangePassword',
+    path: "/changepassword",
+    name: "ChangePassword",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/ForgetPassword/ChangePassword.vue')
+      import(
+        /* webpackChunkName: "about" */ "../views/ForgetPassword/ChangePassword.vue"
+      ),
+      meta: { noAuth: true },
   },
   {
-    path: '/profile',
-    name: 'Profile',
+    path: "/profile",
+    name: "Profile",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/AndroidPages/Profile')
+      import(/* webpackChunkName: "about" */ "../views/AndroidPages/Profile"),
+      meta: { needsAuth: true },
+  },
+  {
+    path: "/addslang",
+    name: "AddSlang",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/AndroidPages/AddSlang"),
+      meta: { needsAuth: true },
   },
   {
     path: "/:catchAll(.*)",
@@ -81,12 +107,42 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "single-product" */ "../views/NotFound.vue"),
   },
-]
+];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
-export default router
+router.beforeEach((to, from, next) => {
+  if (to.meta.needsAuth) {
+    if (store.state.user) {
+      next();
+    } else {
+      next("/signin");
+    }
+  } else {
+    next();
+  }
+
+  if (to.meta.noAuth) {
+    if (!store.state.user) {
+      next();
+    } else {
+      next("/");
+    }
+  } else {
+    next();
+  }
+
+  if (to.name === "VerifyCode") {
+    if (from.name === "signup" || from.name === "signin") {
+      store.commit("SETARRIVEDVIASIGNUP");
+    } else if (from.name === "GetVerificationCode") {
+      store.commit("SETARRIVEDVIAFORGETPASSWORD");
+    }
+  }
+});
+
+export default router;

@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import { SET_BEARER_HTTP } from "@/apis/axiosClient";
 import Loading from "../../components/Loading.vue";
 import { mapState } from "vuex";
 export default {
@@ -54,35 +55,64 @@ export default {
     const changeEmail = () => {
       this.email = this.user.email
     }
+    console.log(this.$store.state.setArrivedViaSignup, this.$store.state.setArrivedViaForgetPassword)
   },
   methods: {
     async ResendVerificationCode() {
       try {
-        const response = await this.$store.dispatch("sendCodeEmail", {email: 'cjjjf'});
-        console.log(response)
+        const response = await this.$store.dispatch("sendCodeEmail", {email: tempUser.email});
+        if (response) {
+          this.$toast.open({
+            message: `Code sent to ${tempUser.email}`,
+            type: 'success', // You can use 'success', 'info', 'error', or 'warning'
+            // Additional options
+            duration: 5000, // Duration in milliseconds
+            dismissible: true, // Whether the toast can be dismissed
+            position: 'top', // Position of the toast
+          });
+        }
       } catch (error) {
         throw error
       }
     },
     async ConfirmVerificationCode() {
       try {
-        console.log(this.token)
-        console.log(this.theCode)
+        this.errorCode = null
+        this.loading = true
         const data = {code: this.theCode}
         const response = await this.$store.dispatch("verifyCode", data);
         console.log(response)
-        if(response) {
+        this.loading = false
+        if (response) {
+          if (this.$store.state.setArrivedViaSignup) {
           this.CodeVerified = true
+          this.$store.commit("RESETARRIVEDSTATE")
+          } else if (this.$store.state.setArrivedViaForgetPassword) {
+            this.$toast.open({
+              message: 'Code Validated',
+              type: 'success', // You can use 'success', 'info', 'error', or 'warning'
+              // Additional options
+              duration: 5000, // Duration in milliseconds
+              dismissible: true, // Whether the toast can be dismissed
+              position: 'top', // Position of the toast
+            });
+            this.$router.push({
+              name: "ChangePassword"
+            })
+            this.$store.commit("RESETARRIVEDSTATE")
+          }
         }
       } catch (error) {
         if(error = 'invalid code'){
           this.errorCode = error
         }
+        this.loading = false
         throw error
       }
     },
     async VERIFYUSER () {
       try {
+        SET_BEARER_HTTP()
         const response = await this.$store.dispatch("verifyUser")
         console.log(response)
         if(response) {
@@ -96,7 +126,7 @@ export default {
     } 
   },
   computed: {
-    ...mapState(["user", "token"]),
+    ...mapState(["tempUser", "token"]),
   },
 };
 </script>

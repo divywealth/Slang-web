@@ -6,8 +6,9 @@
         <div class="cover-photo"></div>
         <div class="user-details">
           <div class="image-container">
-            <img src="../../assets/user-profile1.jpg" class="user-icon" />
-            <div class="camera-container" @click="chooseFile">
+            <img :src="user.profilepic" class="user-icon" v-if="user.profilepic" />
+            <img src="../../assets/user-profile1.jpg" class="user-icon" v-if="!user.profilepic"/>
+            <div class="camera-container">
               <font-awesome-icon
                 icon="fa-solid fa-camera"
                 style="background: #48bb48"
@@ -20,9 +21,14 @@
                 style="display: none"
               />
             </div>
-            <div class="add-photo"><span>Add photo</span></div>
+            <div class="add-photo">
+              <ul>
+                <li @click="chooseFile">Change Photo</li>
+                <li>Delete Photo</li>
+              </ul>
+            </div>
           </div>
-          <span>{{ user.firstname}} {{ user.lastname }}</span>
+          <span>{{ user.firstname }} {{ user.lastname }}</span>
           <span>{{ user.username }}</span>
           <hr style="width: 100%; margin-top: 15px" />
           <div class="phone-section">
@@ -35,10 +41,10 @@
           </div>
           <hr style="width: 100%; margin-top: 15px" />
         </div>
-        <div class="settings-container" @click="SHOWEDITDETAILS">
+        <!-- <div class="settings-container" @click="SHOWEDITDETAILS">
           <font-awesome-icon icon="fa-solid fa-gear" />
           <span>Edit Details</span>
-        </div>
+        </div> -->
         <div class="slang-section">
           <button @click="TOGGLEPENDINGSLANGS">
             <span>Pending Slangs</span>
@@ -51,15 +57,53 @@
         </div>
 
         <!--Pending SLangs-->
-        <section v-if="pendingSlangs"></section>
+        <section v-if="pendingSlangs" class="pendingSection">
+          <table class="slang-table" v-if="!noPendingSlang">
+            <thead>
+              <tr>
+                <th>Slang</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(userPendingSlang, index) in userPendingSlangs"
+                :key="index"
+              >
+                <td>{{ userPendingSlang.slang }}</td>
+                <td>{{ userPendingSlang.meaning }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-if="noPendingSlang">NO PENDING SLANGS</div>
+        </section>
 
         <!--All SLangs-->
-        <section v-if="allSlangs"></section>
+        <section v-if="allSlangs" class="pendingSection">
+          <table class="slang-table" v-if="!noApprovedSlang">
+            <thead>
+              <tr>
+                <th>Slang</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(userApprovedSlang, index) in userApprovedSlangs"
+                :key="index"
+              >
+                <td>{{ userApprovedSlang.slang }}</td>
+                <td>{{ userApprovedSlang.meaning }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-if="noApprovedSlang">USER HASN'T CREATED ANY SLANG</div>
+        </section>
       </div>
     </section>
 
     <!--Android Section-->
-    <section class="android-section">
+    <!-- <section class="android-section">
       <font-awesome-icon
         icon="fa-solid fa-times"
         style="margin: 10px 10px 20px 10px"
@@ -84,8 +128,8 @@
               />
             </div>
           </div>
-          <span>{{ user.firstname}} {{ user.lastname }}</span>
-          <span>{{ user.username}}</span>
+          <span>{{ user.firstname }} {{ user.lastname }}</span>
+          <span>{{ user.username }}</span>
           <hr style="width: 100%; margin-top: 15px" />
           <div class="phone-section">
             <span>Phone</span>
@@ -93,14 +137,14 @@
           </div>
           <div class="phone-section">
             <span>Email</span>
-            <span>{{user.email}}</span>
+            <span>{{ user.email }}</span>
           </div>
           <hr style="width: 100%; margin-top: 15px" />
         </div>
-        <div class="settings-container" @click="SHOWEDITDETAILS">
+        <!-- <div class="settings-container" @click="SHOWEDITDETAILS">
           <font-awesome-icon icon="fa-solid fa-gear" />
           <span>Edit Details</span>
-        </div>
+        </div> -->
         <div class="slang-section">
           <button @click="TOGGLEPENDINGSLANGS">
             <span>Pending Slangs</span>
@@ -112,7 +156,7 @@
           </button>
         </div>
       </div>
-    </section>
+    </section> -->
   </main>
 </template>
 
@@ -124,10 +168,16 @@ export default {
   name: "ProfileModal",
   data() {
     return {
-      filename: "",
+      fileName: null,
       allSlangs: false,
       pendingSlangs: false,
+      noApprovedSlang: false,
+      noPendingSlang: false,
     };
+  },
+  mounted() {
+    this.GETUSERAPPROVEDSLANGS()
+    this.GETUSERPENDINGSLANGS()
   },
   methods: {
     chooseFile() {
@@ -137,22 +187,66 @@ export default {
         console.error("Error occurred while choosing file:", error);
       }
     },
-    handleFileChange(event) {
-      this.filename = event.target.files[0].name;
-      console.log(this.filename);
+    async handleFileChange(event) {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        this.fileName = files[0];
+      }
+      const formData = new FormData();
+      formData.append('file', this.fileName);
+      try {
+        const response = await this.$store.dispatch("updateProfilePic", formData)
+        console.log(response)
+        console.log(this.user)
+      } catch (error) {
+        throw error;
+      }
     },
     CLOSEMODAL() {
-      this.$emit('CLOSEMODAL')
+      this.$emit("CLOSEMODAL");
     },
-    SHOWEDITDETAILS() {
-      this.$store.state.showProfileModal = false;
-      this.$store.state.EditDetails = true;
-    },
+    // SHOWEDITDETAILS() {
+    //   this.$store.state.showProfileModal = false;
+    //   this.$store.state.EditDetails = true;
+    // },
     TOGGLEPENDINGSLANGS() {
-      this.pendingSlangs = !this.pendingSlangs;
+      if (this.allSlangs == true) {
+        this.allSlangs = false;
+        this.pendingSlangs = !this.pendingSlangs;
+      } else {
+        this.pendingSlangs = !this.pendingSlangs;
+      }
     },
     TOGGLEALLSLANGS() {
-      this.allSlangs = !this.allSlangs;
+      console.log(this.pendingSlangs, this.allSlangs);
+      if (this.pendingSlangs == true) {
+        this.pendingSlangs = false;
+        this.allSlangs = !this.allSlangs;
+      } else {
+        this.allSlangs = !this.allSlangs;
+      }
+    },
+    async GETUSERAPPROVEDSLANGS() {
+      try {
+        const response = await this.$store.dispatch("getUserApprovedSlangs");
+        console.log(response);
+        if (response == "User has not added any slang yet") {
+          this.noApprovedSlang = true;
+        }
+      } catch (error) {
+        throw error;
+      }
+    },
+    async GETUSERPENDINGSLANGS() {
+      try {
+        const response = await this.$store.dispatch("getUserPendingSlangs");
+        console.log(response);
+        if (response == "User has no pending slang") {
+          this.noPendingSlang = true;
+        }
+      } catch (error) {
+        throw error;
+      }
     },
   },
   computed: {
@@ -162,9 +256,8 @@ export default {
     iconName() {
       return this.allSlangs ? faCaretDown : faCaretUp;
     },
-    ...mapState(["user"])
+    ...mapState(["user", "userPendingSlangs", "userApprovedSlangs"]),
   },
-
 };
 </script>
 
@@ -208,21 +301,37 @@ export default {
 }
 .camera-container:hover + .add-photo {
   display: block;
+  opacity: 1
+}
+.add-photo:hover {
+  display: block
 }
 .add-photo {
   position: absolute;
   top: 50%;
-  left: 110%;
+  left: 97%;
   display: none;
-  background: #48bb48;
   white-space: nowrap;
-  padding: 2px 10px;
-  border-radius: 20px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 1px 0px;
+  transition: opacity 0.5s
 }
 .add-photo span {
   background: #48bb48;
   color: white;
   font-size: 10px;
+}
+.add-photo ul {
+  list-style: none;
+}
+.add-photo ul li {
+  border-bottom: 1px solid grey;
+  padding: 5px 20px;
+  transition: opacity 0.5s;
+  cursor: pointer;
+}
+.add-photo ul li:hover {
+  background: grey
 }
 .cover-photo {
   height: 100px;
@@ -293,6 +402,30 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.pendingSection {
+  padding: 10px 20px;
+}
+.slang-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.slang-table tbody {
+}
+.slang-table tbody tr {
+}
+.slang-table tbody tr td {
+  border: 1px solid #d6dbd5;
+  padding: 10px 5px;
+  font-family: sans-serif;
+  color: #606063;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  text-overflow: ellipsis;
+}
+.slang-table thead tr th {
+  border: 1px solid #d6dbd5;
 }
 @media only screen and (max-width: 1025px) {
   .backdrop {

@@ -5,8 +5,9 @@
         <div class="cover-photo"></div>
         <div class="user-details">
           <div class="image-container">
-            <img src="../../assets/user-profile1.jpg" class="user-icon" />
-            <div class="camera-container" @click="chooseFile">
+            <img :src="user.profilepic" class="user-icon" v-if="user.profilepic" />
+            <img src="../../assets/user-profile1.jpg" class="user-icon" v-if="!user.profilepic" />
+            <div class="camera-container" @click="TOGGLESHOWPROFILE">
               <font-awesome-icon
                 icon="fa-solid fa-camera"
                 style="background: #48bb48"
@@ -18,6 +19,12 @@
                 accept="image/*"
                 style="display: none"
               />
+            </div>
+            <div class="add-photo" v-if="showProfilePic">
+              <ul>
+                <li @click="chooseFile">Change Photo</li>
+                <li>Delete Photo</li>
+              </ul>
             </div>
           </div>
           <span>{{ user.firstname }} {{ user.lastname }}</span>
@@ -33,10 +40,10 @@
           </div>
           <hr style="width: 100%; margin-top: 15px" />
         </div>
-        <div class="settings-container" @click="SHOWEDITDETAILS">
+        <!-- <div class="settings-container" @click="SHOWEDITDETAILS">
           <font-awesome-icon icon="fa-solid fa-gear" />
           <span>Edit Details</span>
-        </div>
+        </div> -->
         <div class="slang-section">
           <button @click="TOGGLEPENDINGSLANGS">
             <span>Pending Slangs</span>
@@ -47,9 +54,52 @@
             <font-awesome-icon :icon="iconName" class="arrow-down" />
           </button>
         </div>
+
+        <!--Pending SLangs-->
+        <section v-if="pendingSlangs" class="pendingSection">
+          <table class="slang-table" v-if="!noPendingSlang">
+            <thead>
+              <tr>
+                <th>Slang</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(userPendingSlang, index) in userPendingSlangs"
+                :key="index"
+              >
+                <td>{{ userPendingSlang.slang }}</td>
+                <td>{{ userPendingSlang.meaning }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-if="noPendingSlang"> NO PENDING SLANGS </div>
+        </section>
+
+        <!--All SLangs-->
+        <section v-if="allSlangs" class="pendingSection">
+          <table class="slang-table" v-if="!noApprovedSlang">
+            <thead>
+              <tr>
+                <th>Slang</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(userApprovedSlang, index) in userApprovedSlangs"
+                :key="index"
+              >
+                <td>{{ userApprovedSlang.slang }}</td>
+                <td>{{ userApprovedSlang.meaning }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-if="noApprovedSlang"> USER HASN'T CREATED ANY SLANG </div>
+        </section>
       </div>
     </section>
-    <Footer />
   </main>
 </template>
 
@@ -67,7 +117,14 @@ export default {
       filename: "",
       allSlangs: false,
       pendingSlangs: false,
+      noApprovedSlang: false,
+      noPendingSlang: false,
+      showProfilePic: false
     };
+  },
+  mounted() {
+    this.GETUSERAPPROVEDSLANGS(),
+    this.GETUSERPENDINGSLANGS()
   },
   methods: {
     chooseFile() {
@@ -77,9 +134,62 @@ export default {
         console.error("Error occurred while choosing file:", error);
       }
     },
-    handleFileChange(event) {
-      this.filename = event.target.files[0].name;
-      console.log(this.filename);
+    async handleFileChange(event) {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        this.fileName = files[0];
+      }
+      const formData = new FormData();
+      formData.append('file', this.fileName);
+      try {
+        const response = await this.$store.dispatch("updateProfilePic", formData)
+        console.log(response)
+        console.log(this.user)
+      } catch (error) {
+        throw error;
+      }
+    },
+    TOGGLEPENDINGSLANGS() {
+      if (this.allSlangs == true) {
+        this.allSlangs = false;
+        this.pendingSlangs = !this.pendingSlangs;
+      } else {
+        this.pendingSlangs = !this.pendingSlangs;
+      }
+    },
+    TOGGLEALLSLANGS() {
+      console.log(this.pendingSlangs, this.allSlangs);
+      if (this.pendingSlangs == true) {
+        this.pendingSlangs = false;
+        this.allSlangs = !this.allSlangs;
+      } else {
+        this.allSlangs = !this.allSlangs;
+      }
+    },
+    TOGGLESHOWPROFILE() {
+      this.showProfilePic = !this.showProfilePic
+    },
+    async GETUSERAPPROVEDSLANGS() {
+      try {
+        const response = await this.$store.dispatch("getUserApprovedSlangs");
+        console.log(response);
+        if (response == "User has not added any slang yet") {
+          this.noApprovedSlang = true
+        }
+      } catch (error) {
+        throw error;
+      }
+    },
+    async GETUSERPENDINGSLANGS() {
+      try {
+        const response = await this.$store.dispatch("getUserPendingSlangs");
+        console.log(response);
+        if (response == "User has no pending slang") {
+          this.noPendingSlang = true
+        }
+      } catch (error) {
+        throw error;
+      }
     },
   },
   computed: {
@@ -89,7 +199,7 @@ export default {
     iconName() {
       return this.allSlangs ? faCaretDown : faCaretUp;
     },
-    ...mapState(["user"]),
+    ...mapState(["user", "userPendingSlangs", "userApprovedSlangs"]),
   },
 };
 </script>
@@ -113,17 +223,25 @@ export default {
 .add-photo {
   position: absolute;
   top: 50%;
-  left: 110%;
-  display: none;
-  background: #48bb48;
+  left: 99%;
   white-space: nowrap;
-  padding: 2px 10px;
-  border-radius: 20px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 1px 0px;
+  transition: opacity 0.5s
 }
 .add-photo span {
   background: #48bb48;
   color: white;
   font-size: 10px;
+}
+.add-photo ul {
+  list-style: none;
+}
+.add-photo ul li {
+  border-bottom: 1px solid grey;
+  padding: 5px 15px;
+  transition: opacity 0.5s;
+  cursor: pointer;
 }
 .cover-photo {
   height: 100px;
@@ -194,6 +312,30 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.pendingSection {
+  padding: 10px 20px;
+}
+.slang-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.slang-table tbody {
+}
+.slang-table tbody tr {
+}
+.slang-table tbody tr td {
+  border: 1px solid #d6dbd5;
+  padding: 10px 5px;
+  font-family: sans-serif;
+  color: #606063;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  text-overflow: ellipsis;
+}
+.slang-table thead tr th {
+  border: 1px solid #d6dbd5;
 }
 @media only screen and (max-width: 1025px) {
   .android-section {
