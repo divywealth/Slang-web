@@ -1,5 +1,8 @@
 import {
+  approveSlangApi,
   createSlangApi,
+  deleteSlangApi,
+  getPendingSlangsApi,
   getSlangApi,
   getUserApprovedSlangApi,
   getUserPendingSlangApi,
@@ -9,7 +12,6 @@ import {
 export const slangActions = {
   async createSlang({ commit }, data) {
     try {
-      console.log(data);
       const response = await createSlangApi(data);
       return response;
     } catch (error) {
@@ -19,7 +21,6 @@ export const slangActions = {
 
   async getSlang({ commit }, data) {
     try {
-      console.log(data);
       const response = await getSlangApi(data);
       return response;
     } catch (error) {
@@ -54,6 +55,33 @@ export const slangActions = {
       if (typeof response != String) {
         commit("SETUSERPENDINGSLANGS", response);
       }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async approveSlang({ commit }, id) {
+    try {
+      const response = await approveSlangApi(id);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteSlang({ commit }, id) {
+    try {
+      const response = await deleteSlangApi(id);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async getPendingSlangs() {
+    try {
+      const response = await getPendingSlangsApi();
       return response;
     } catch (error) {
       throw error;

@@ -5,6 +5,8 @@ import { slangActions } from "./actions/slangactions";
 import createPersistedState from "vuex-persistedstate";
 import { codeActions } from "./actions/codeactions";
 import { reactionActions } from "./actions/reactionactions";
+import VueJwtDecode from "vue-jwt-decode";
+import { format, isBefore, isAfter, parseISO, parseJSON } from "date-fns";
 
 Vue.use(Vuex);
 
@@ -55,12 +57,40 @@ export default new Vuex.Store({
       Vue.set(state, "setArrivedViaSignup", false);
       Vue.set(state, "setArrivedViaForgetPassword", false);
     },
+    AUTO_LOGOUT(state) {
+      if (state.token != null) {
+        const decodedToken = VueJwtDecode.decode(state.token);
+        const exp = decodedToken.exp;
+        const tokenExpDate = new Date(exp * 1000);
+        console.log(`this is tokenDate ${tokenExpDate}`);
+        const currentDate = new Date();
+        console.log(`this is currentDate ${currentDate}`);
+        const isTokenExpired = isAfter(currentDate, tokenExpDate);
+        console.log(isTokenExpired);
+        if (isTokenExpired === true) {
+          Vue.set(state, "user", null);
+          Vue.set(state, "token", null);
+        }
+      }
+    },
+    handleLogOut(state) {
+      state.user = null;
+      state.token = null;
+    },
   },
   actions: {
     ...userActions,
     ...slangActions,
     ...codeActions,
     ...reactionActions,
+    async AUTO_LOGOUT ({ commit }) {
+      commit("AUTO_LOGOUT");
+      localStorage.clear();
+    },
+    async handleLogOut({ commit }) {
+      commit("handleLogOut")
+      localStorage.clear();
+    },
   },
   modules: {},
   plugins: [

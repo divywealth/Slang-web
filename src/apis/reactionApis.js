@@ -9,22 +9,38 @@ export const createReactionApi = async (data) => {
   }
 };
 
-export const getSlangLikesApi = async () => {
+export const getSlangLikesApi = async (data) => {
   try {
-    const response = await BASIC_HTTP.get("v1/slang/:slangId/likes");
+    const response = await BASIC_HTTP.get(`v1/slang/${data}/likes`);
     return response.data;
   } catch (error) {
     throw error.response.data.message;
   }
 };
 
-export const getSlangDislikesApi = async () => {
+export const getSlangDislikesApi = async (data) => {
   try {
-    const response = await BASIC_HTTP.get("v1/slang/:slangId/dislikes");
+    const response = await BASIC_HTTP.get(`v1/slang/${data}/dislikes`);
     return response.data;
   } catch (error) {
     throw error.response.data.message;
   }
 };
 
+export const userSlangReactionApi = async (data) => {
+  try {
+    const response = await BEARER_HTTP.get(`v1/user/${data}/reaction`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data.message;
+  }
+};
 
+export const deleteSlangReactionApi = async (id) => {
+  try {
+    const response = await BASIC_HTTP.delete(`v1/reaction/${id}`);
+    return response.data
+  } catch (error) {
+    throw error.response.data.message
+  }
+}

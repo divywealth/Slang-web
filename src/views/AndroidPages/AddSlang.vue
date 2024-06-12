@@ -8,9 +8,6 @@
           <div class="input-container">
             <label>Slang</label>
             <input type="text" v-model="slang" required />
-            <div v-if="slangError" class="formError">
-              {{ slangError }}
-            </div>
           </div>
 
           <div>
@@ -28,7 +25,7 @@
 
           <div class="submitBox">
             <button class="submit">
-              <span style="background: none" v-if="!isLoading">Done</span>
+              <span style="background: none" v-if="!isLoading">SUBMIT</span>
               <Loading style="margin: 0 auto" v-if="isLoading" />
             </button>
           </div>
@@ -52,7 +49,6 @@ export default {
       isLoading: false,
       slang: "",
       meaning: "",
-      slangError: null,
     };
   },
   methods: {
@@ -69,20 +65,20 @@ export default {
         if (response) {
           this.$router.push({
             name: "home",
+            query: { showToast: true },
           });
+          return response;
+        }
+      } catch (error) {
+        if (error) {
           this.$toast.open({
-            message: "Slang added successfully. Thanks",
-            type: "success", // You can use 'success', 'info', 'error', or 'warning'
+            message: error,
+            type: "error", // You can use 'success', 'info', 'error', or 'warning'
             // Additional options
             duration: 5000, // Duration in milliseconds
             dismissible: true, // Whether the toast can be dismissed
             position: "top", // Position of the toast
           });
-          return response;
-        }
-      } catch (error) {
-        if (error == "Slang already exist") {
-          this.slangError = error;
         }
         this.isLoading = false;
         throw error;
@@ -166,13 +162,6 @@ export default {
   flex-direction: column;
   align-items: end;
   margin-bottom: 30px;
-}
-.formError {
-  color: #ff0050;
-  font-size: 0.8em;
-  font-weight: bold;
-  margin-top: 10px;
-  font-family: sans-serif;
 }
 .input-container {
 }

@@ -44,3 +44,30 @@ export const getUserPendingSlangApi = async () => {
     throw error.response.data.message;
   }
 };
+
+export const approveSlangApi =  async (id) => {
+  try {
+    const response = await BASIC_HTTP.patch(`v1/approve/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data.message
+  }
+}
+
+export const deleteSlangApi =  async (id) => {
+  try {
+    const response = await BASIC_HTTP.delete(`v1/slang/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data.message
+  }
+}
+
+export const getPendingSlangsApi =  async () => {
+  try {
+    const response = await BASIC_HTTP.get(`v1/pendingslangs`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data.message
+  }
+}

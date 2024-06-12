@@ -102,6 +102,15 @@ const routes = [
       meta: { needsAuth: true },
   },
   {
+    path: "/approve",
+    name: "Approve",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/AndroidPages/Approve.vue"),
+  },
+  {
     path: "/:catchAll(.*)",
     name: "NotFound",
     component: () =>
@@ -116,6 +125,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  //Cant access this pages if not signed in
   if (to.meta.needsAuth) {
     if (store.state.user) {
       next();
@@ -126,6 +136,7 @@ router.beforeEach((to, from, next) => {
     next();
   }
 
+  //Cant access this pages if signed in
   if (to.meta.noAuth) {
     if (!store.state.user) {
       next();
@@ -134,6 +145,24 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     next();
+  }
+
+  //Cant access this pages if on desktop mode and android mode
+  if(to.name === "Profile" || to.name === "AddSlang") {
+    if (window.innerWidth > 1025) {
+      next("/")
+    } else {
+      next()
+    }
+  }
+
+  //Cant access approve page only admin
+  if (to.name === "Approve") {
+    if (store.state.user.role === "admin") {
+      next()
+    } else {
+      next("/")
+    }
   }
 
   if (to.name === "VerifyCode") {

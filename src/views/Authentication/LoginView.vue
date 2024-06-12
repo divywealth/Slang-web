@@ -72,14 +72,13 @@ export default {
         };
         SET_BEARER_HTTP();
         const response = await this.$store.dispatch("loginUser", data);
-        console.log(response);
         if (this.user == null) {
+          this.loading = false;
           this.$router.push({
             name: "VerifyCode",
           });
         } else {
-          this.loading = false;
-          await this.$router.push({
+          this.$router.push({
             name: "home",
           });
         }
@@ -96,6 +95,9 @@ export default {
         this.loading = false;
       }
     },
+  },
+  computed: {
+    ...mapState(["user", "token"]),
   },
 };
 </script>
@@ -200,7 +202,6 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 40px;
   }
   .image-section {
     flex: 0;

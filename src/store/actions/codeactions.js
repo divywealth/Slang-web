@@ -3,7 +3,6 @@ import { sendCodeEmailApi, sendCodePasswordApi, verifyCodeApi } from "@/apis/cod
 export const codeActions = {
   async verifyCode({ commit }, data) {
     try {
-      console.log(data);
       const response = await verifyCodeApi(data);
       return response;
     } catch (error) {

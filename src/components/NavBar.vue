@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     GOTOPROFILE() {
-      if (user) {
+      if (this.user) {
         if (window.innerWidth > 1025) {
           this.$emit("CHANGEPROFILE");
         } else {

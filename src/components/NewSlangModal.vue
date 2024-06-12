@@ -14,9 +14,6 @@
           <div>
             <label>Slang</label>
             <input type="text" v-model="slang" required />
-            <div v-if="slangError" class="formError">
-              {{ slangError }}
-            </div>
           </div>
 
           <div>
@@ -34,7 +31,7 @@
 
           <div class="submitBox">
             <button class="submit">
-              <span style="background: none" v-if="!isLoading">Done</span>
+              <span style="background: none" v-if="!isLoading">SUBMIT</span>
               <Loading style="margin: 0 auto" v-if="isLoading" />
             </button>
           </div>
@@ -55,7 +52,6 @@ export default {
       isLoading: false,
       slang: "",
       meaning: "",
-      slangError: null,
     };
   },
   methods: {
@@ -74,8 +70,15 @@ export default {
           return response;
         }
       } catch (error) {
-        if (error == "Slang already exist") {
-          this.slangError = error;
+        if (error) {
+          this.$toast.open({
+            message: error,
+            type: "error", // You can use 'success', 'info', 'error', or 'warning'
+            // Additional options
+            duration: 5000, // Duration in milliseconds
+            dismissible: true, // Whether the toast can be dismissed
+            position: "top", // Position of the toast
+          });
         }
         this.isLoading = false;
         throw error;
@@ -179,12 +182,5 @@ export default {
   flex-direction: column;
   align-items: end;
   margin-bottom: 30px;
-}
-.formError {
-  color: #ff0050;
-  font-size: 0.8em;
-  font-weight: bold;
-  margin-top: 10px;
-  font-family: sans-serif;
 }
 </style>

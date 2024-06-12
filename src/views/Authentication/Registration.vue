@@ -17,6 +17,9 @@
 
         <label>email</label>
         <input class="input" type="email" v-model="email" required />
+        <div v-if="emailError" class="formError">
+          {{ emailError }}
+        </div>
 
         <label>Password</label>
         <input class="input" type="password" v-model="password" required />
@@ -67,6 +70,7 @@ export default {
       firstname: "",
       lastname: "",
       email: "",
+      emailError: null,
       username: "",
       password: "",
       confirmPassword: "",
@@ -92,6 +96,11 @@ export default {
           return;
         }
         this.loading = true;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!emailPattern.test(this.email)) {
+          this.emailError = "Invalid Email";
+          return;
+        }
         const data = {
           firstname: this.firstname,
           lastname: this.lastname,
@@ -99,10 +108,7 @@ export default {
           username: this.username,
           password: this.password,
         };
-        console.log(data);
-        const response = await this.$store.dispatch("createUser", data)
-        console.log(response)
-        console.log(this.token)
+        const response = await this.$store.dispatch("createUser", data);
         if (response) {
           this.loading = false;
           SET_BEARER_HTTP();
@@ -111,7 +117,16 @@ export default {
           });
         }
       } catch (error) {
-        console.log(error)
+        if (error) {
+          this.$toast.open({
+            message: error,
+            type: "error", // You can use 'success', 'info', 'error', or 'warning'
+            // Additional options
+            duration: 5000, // Duration in milliseconds
+            dismissible: true, // Whether the toast can be dismissed
+            position: "top", // Position of the toast
+          });
+        }
         throw error;
       }
     },
@@ -206,7 +221,6 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 40px;
   }
   .image-section {
     flex: 0;

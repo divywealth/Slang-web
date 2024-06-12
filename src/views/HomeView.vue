@@ -1,14 +1,14 @@
 <template>
   <div class="home">
-    <NavBar @CHANGEPROFILE="TOGGLEPROFILE"/>
-    <Body @CHANGESLANGMODAL="TOGGLESLANGMODAL"/>
+    <NavBar @CHANGEPROFILE="TOGGLEPROFILE" />
+    <Body @CHANGESLANGMODAL="TOGGLESLANGMODAL" />
     <NewSlangModal
       v-if="showAddSlangModal"
       class="new-slang-modal"
       @CLOSESLANGMODAL="TOGGLESLANGMODAL"
       @CLOSESLANGMODALSUCESS="TOGGLESLANGSUCESS"
     />
-    <ProfileModal v-if="showProfileModal" @CLOSEMODAL="TOGGLEPROFILE"/>
+    <ProfileModal v-if="showProfileModal" @CLOSEMODAL="TOGGLEPROFILE" />
     <!-- <EditDetails v-if="this.$store.state.EditDetails" />
     <ChangeUsername v-if="this.$store.state.ChangeUsername" />
     <ChangeEmail v-if="this.$store.state.ChangeEmail" />
@@ -55,27 +55,50 @@ export default {
     };
   },
   mounted() {
-    SET_BEARER_HTTP()
+    SET_BEARER_HTTP();
+    this.$store.dispatch("AUTO_LOGOUT");
+  },
+  beforeRouteEnter(to, from, next) {
+    if (from.name == "AddSlang" && to.query.showToast) {
+      // This guard is called before the route is confirmed
+      next((vm) => {
+        // Call the function after the route is confirmed and the component is loaded
+        vm.CALLTOAST();
+      });
+    }else {
+      next();
+    }
   },
   methods: {
     TOGGLEPROFILE() {
       this.showProfileModal = !this.showProfileModal;
     },
     TOGGLESLANGMODAL() {
-      this.showAddSlangModal = !this.showAddSlangModal
+      this.showAddSlangModal = !this.showAddSlangModal;
     },
     TOGGLESLANGSUCESS() {
       this.showAddSlangModal = !this.showAddSlangModal;
       this.$toast.open({
-        message: 'Slang added successfully. Thanks',
-        type: 'success', // You can use 'success', 'info', 'error', or 'warning'
+        message: "Slang added successfully. Thanks",
+        type: "success", // You can use 'success', 'info', 'error', or 'warning'
         // Additional options
         duration: 5000, // Duration in milliseconds
         dismissible: true, // Whether the toast can be dismissed
-        position: 'top', // Position of the toast
+        position: "top", // Position of the toast
       });
-    }
+    },
+    CALLTOAST() {
+      this.$toast.open({
+        message: "Slang added successfully. Thanks",
+        type: "success", // You can use 'success', 'info', 'error', or 'warning'
+        // Additional options
+        duration: 5000, // Duration in milliseconds
+        dismissible: true, // Whether the toast can be dismissed
+        position: "top", // Position of the toast
+      });
+    },
   },
+
   computed: {
     ...mapState(["user", "token"]),
   },

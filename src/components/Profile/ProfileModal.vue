@@ -45,6 +45,10 @@
           <font-awesome-icon icon="fa-solid fa-gear" />
           <span>Edit Details</span>
         </div> -->
+        <div class="settings-container" @click="LOGOUT">
+          <font-awesome-icon icon="fa-solid fa-right-from-bracket" />
+          <span>Log out</span>
+        </div>
         <div class="slang-section">
           <button @click="TOGGLEPENDINGSLANGS">
             <span>Pending Slangs</span>
@@ -162,6 +166,7 @@
 
 <script>
 import { mapState } from "vuex";
+import { SET_BEARER_HTTP } from "@/apis/axiosClient";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 export default {
@@ -176,6 +181,7 @@ export default {
     };
   },
   mounted() {
+    SET_BEARER_HTTP()
     this.GETUSERAPPROVEDSLANGS()
     this.GETUSERPENDINGSLANGS()
   },
@@ -196,8 +202,6 @@ export default {
       formData.append('file', this.fileName);
       try {
         const response = await this.$store.dispatch("updateProfilePic", formData)
-        console.log(response)
-        console.log(this.user)
       } catch (error) {
         throw error;
       }
@@ -218,7 +222,6 @@ export default {
       }
     },
     TOGGLEALLSLANGS() {
-      console.log(this.pendingSlangs, this.allSlangs);
       if (this.pendingSlangs == true) {
         this.pendingSlangs = false;
         this.allSlangs = !this.allSlangs;
@@ -229,7 +232,6 @@ export default {
     async GETUSERAPPROVEDSLANGS() {
       try {
         const response = await this.$store.dispatch("getUserApprovedSlangs");
-        console.log(response);
         if (response == "User has not added any slang yet") {
           this.noApprovedSlang = true;
         }
@@ -240,13 +242,16 @@ export default {
     async GETUSERPENDINGSLANGS() {
       try {
         const response = await this.$store.dispatch("getUserPendingSlangs");
-        console.log(response);
         if (response == "User has no pending slang") {
           this.noPendingSlang = true;
         }
       } catch (error) {
         throw error;
       }
+    },
+    async LOGOUT() {
+      await this.$store.dispatch("handleLogOut");
+      this.$emit("CLOSEMODAL");
     },
   },
   computed: {

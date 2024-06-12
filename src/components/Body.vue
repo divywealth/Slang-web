@@ -25,8 +25,8 @@
             to its meaning and not the other way round
           </p>
           <p class="note">
-            Note: Slangs searched should start with capital letter so you get
-            the meaning
+            Note: Sorry if you cant see added slangs instantly, Slangs added wont be displayed till it 
+            is reviewed and approved 
           </p>
           <p class="note">
             -To add slang you have to sign in then your added slang will be
@@ -56,29 +56,31 @@
               <div class="load_spinner" v-if="show_spinner"></div>
             </div>
           </div>
-          <div class="meaning-container" v-if="slangDetails">
+          <div class="meaning-container" v-if="gottenSlangDetails">
             <span>{{ slangDetails.meaning }}</span>
             <span class="authur">-{{ slangDetails.user.username }}</span>
             <section class="reaction-section">
               <div>
-                <font-awesome-icon icon="fa-solid fa-thumbs-up" class="icon" @click="REACTTOSLANG("Like")" v-if="!liked"/>
-                <font-awesome-icon icon="fa-solid fa-thumbs-up" class="icon" @click="REACTTOSLANG("Like")" v-if="liked"/>
-                <span>{{likes}}</span>
+                <font-awesome-icon
+                  :icon="
+                    liked ? 'fa-solid fa-thumbs-up' : 'fa-regular fa-thumbs-up'
+                  "
+                  class="icon"
+                  @click="REACTTOSLANG('Like')"
+                />
+                <span>{{ likes }}</span>
               </div>
               <div>
                 <font-awesome-icon
-                  icon="fa-solid fa-thumbs-down"
+                  :icon="
+                    disliked
+                      ? 'fa-solid fa-thumbs-down'
+                      : 'fa-regular fa-thumbs-down'
+                  "
                   class="icon"
-                  @click="REACTTOSLANG("Dislike")"
-                  v-if="!disliked"
+                  @click="REACTTOSLANG('Dislike')"
                 />
-                <font-awesome-icon
-                  icon="fa-solid fa-thumbs-down"
-                  class="icon"
-                  @click="REACTTOSLANG("Dislike")"
-                  v-if="disliked"
-                />
-                <span>{{dislikes}}</span>
+                <span>{{ dislikes }}</span>
               </div>
               <!-- <div>
                 <font-awesome-icon icon="fa-solid fa-flag" class="icon" />
@@ -102,30 +104,75 @@ export default {
       gotData: false,
       meaning: null,
       slangDetails: null,
+      gottenSlangDetails: false,
       slangError: null,
       liked: false,
       disliked: false,
-      likes: null,
-      dislikes: null
+      likes: 0,
+      dislikes: 0,
+      userSlangReaction: null
     };
   },
   methods: {
+    async GETSLANGREACTIONS() {
+      try {
+        const likes = await this.$store.dispatch(
+          "getSlangLikes",
+          this.slangDetails._id
+        );
+        this.likes = likes.length;
+        const dislikes = await this.$store.dispatch(
+          "getSlangDislikes",
+          this.slangDetails._id
+        );
+        this.dislikes = dislikes.length;
+      } catch (error) {
+        throw error;
+      }
+    },
+    async GETUSERSLANGREACTION() {
+      try {
+        this.liked = false;
+        this.disliked = false;
+        const reaction = await this.$store.dispatch(
+          "getUserSlangReaction",
+          this.slangDetails._id
+        );
+        this.userSlangReaction = reaction
+        if (typeof reaction !== "string") {
+          if (reaction.react == "Like") {
+            this.liked = true;
+          } else {
+            this.disliked = true;
+          }
+        } else {
+          this.liked = false;
+          this.disliked = false;
+        }
+      } catch (error) {
+        throw error;
+      }
+    },
     async HANDLEGETSLANGMEANING() {
       try {
+        this.gottenSlangDetails = false;
         this.show_spinner = true;
         this.slangError = null;
         const convertedSlang = this.slang.toUpperCase();
         const data = {
           slang: convertedSlang,
         };
-        const response = await this.$store.dispatch("getSlang", data);
+        const response = this.$store.dispatch("getSlang", data);
+        const slangResponse = await response;
+        this.slangDetails = slangResponse;
+        const reactionsPromise = this.GETSLANGREACTIONS();
+        const userReactionPromise = this.GETUSERSLANGREACTION();
+        await Promise.all([reactionsPromise, userReactionPromise]);
         this.show_spinner = false;
-        this.slangDetails = response;
-        console.log(response.user.username);
+        this.gottenSlangDetails = true;
       } catch (error) {
         if (
-          error ==
-          "Slang not available you can try adding the slang if you know the meaning"
+          error
         ) {
           this.slangError = error;
         }
@@ -137,10 +184,10 @@ export default {
       if (this.user) {
         if (window.innerWidth > 1025) {
           this.$emit("CHANGESLANGMODAL");
-        }else {
+        } else {
           this.$router.push({
-            name: "AddSlang"
-          })
+            name: "AddSlang",
+          });
         }
       } else {
         this.$toast.open({
@@ -155,28 +202,45 @@ export default {
     },
     async REACTTOSLANG(reaction) {
       try {
-        const data = {
-          slang: this.slangDetails.id,
-          react: reaction
-        }
-        const response = await this.$store.dispatch("createReaction", data)
-        if(response) {
-          GETSLANGREACTIONS()
+        if (this.liked == true || this.disliked == true) {
+          const deleteReactionPromise = this.DELETEUSERREACTION();
+          const reactionsPromise = this.GETSLANGREACTIONS();
+          const userReactionPromise = this.GETUSERSLANGREACTION();
+          await Promise.all([
+            reactionsPromise,
+            userReactionPromise,
+            deleteReactionPromise,
+          ]);
+          if(deleteReactionPromise) {
+            console.log(deleteReactionPromise)
+            this.liked = false,
+            this.disliked = false
+          }
+        } else {
+          const data = {
+            slang: this.slangDetails._id,
+            react: reaction,
+          };
+          const response = await this.$store.dispatch("createReaction", data);
+          console.log(response);
+          if (response) {
+            await this.GETSLANGREACTIONS();
+            await this.GETUSERSLANGREACTION();
+          }
         }
       } catch (error) {
-        throw error
+        throw error;
       }
     },
-    async GETSLANGREACTIONS () {
+    async DELETEUSERREACTION() {
       try {
-        const likes = await this.$store.dispatch("getSlangLikes");
-        console.log(likes, likes.length)
-        this.likes = likes.length;
-        const dislikes = await this.$store.dispatch("getSlangDislikes");
-        console.log(dislikes, dislikes.length)
-        this.dislikes = dislikes.length
+        const response = await this.$store.dispatch(
+          "deleteUserSlangReaction",
+          this.userSlangReaction._id
+        );
+        return response;
       } catch (error) {
-        throw error
+        throw error;
       }
     },
     // async GETSLANGDISLIKES() {
@@ -296,6 +360,7 @@ export default {
   font-family: sans-serif;
   padding: 20px 10px;
   display: flex;
+  width: 500px;
   flex-direction: column;
 }
 .meaning-container span {
@@ -502,6 +567,9 @@ export default {
   .statement-two {
     margin-top: 10px;
     font-size: 40px;
+  }
+  .meaning-container {
+    width: 300px;
   }
   .top-writing {
     font-size: 25px;

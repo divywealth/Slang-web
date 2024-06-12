@@ -148,7 +148,6 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 40px;
   }
   .image-section {
     flex: 0;
