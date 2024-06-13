@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="main">
     <section class="android-section">
       <div class="android-modal">
         <div class="cover-photo"></div>
@@ -212,6 +212,12 @@ export default {
 </script>
 
 <style>
+.main {
+  height: 100vh; /* Full viewport height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  display: flex;
+  flex-direction: column;
+}
 .image-container {
   position: relative;
 }
@@ -313,6 +319,7 @@ export default {
   background: none;
 }
 .android-section {
+  flex: 1;
   display: none;
 }
 .android-modal {
