@@ -25,8 +25,8 @@
             to its meaning and not the other way round
           </p>
           <p class="note">
-            Note: Sorry if you cant see added slangs instantly, Slangs added wont be displayed till it 
-            is reviewed and approved 
+            Note: Sorry if you cant see added slangs instantly, Slangs added
+            wont be displayed till it is reviewed and approved
           </p>
           <p class="note">
             -To add slang you have to sign in then your added slang will be
@@ -110,7 +110,7 @@ export default {
       disliked: false,
       likes: 0,
       dislikes: 0,
-      userSlangReaction: null
+      userSlangReaction: null,
     };
   },
   methods: {
@@ -132,23 +132,23 @@ export default {
     },
     async GETUSERSLANGREACTION() {
       try {
-        this.liked = false;
-        this.disliked = false;
-        const reaction = await this.$store.dispatch(
-          "getUserSlangReaction",
-          this.slangDetails._id
-        );
-        this.userSlangReaction = reaction
-        if (typeof reaction !== "string") {
-          if (reaction.react == "Like") {
-            this.liked = true;
-          } else {
-            this.disliked = true;
-          }
-        } else {
           this.liked = false;
           this.disliked = false;
-        }
+          const reaction = await this.$store.dispatch(
+            "getUserSlangReaction",
+            this.slangDetails._id
+          );
+          this.userSlangReaction = reaction;
+          if (typeof reaction !== "string") {
+            if (reaction.react == "Like") {
+              this.liked = true;
+            } else {
+              this.disliked = true;
+            }
+          } else {
+            this.liked = false;
+            this.disliked = false;
+          }
       } catch (error) {
         throw error;
       }
@@ -166,14 +166,15 @@ export default {
         const slangResponse = await response;
         this.slangDetails = slangResponse;
         const reactionsPromise = this.GETSLANGREACTIONS();
-        const userReactionPromise = this.GETUSERSLANGREACTION();
-        await Promise.all([reactionsPromise, userReactionPromise]);
+        if (this.user) {
+          const userReactionPromise = await this.GETUSERSLANGREACTION();
+        }
+        await Promise.all([reactionsPromise]);
+        console.log(reactionsPromise)
         this.show_spinner = false;
         this.gottenSlangDetails = true;
       } catch (error) {
-        if (
-          error
-        ) {
+        if (error) {
           this.slangError = error;
         }
         this.show_spinner = false;
@@ -202,31 +203,41 @@ export default {
     },
     async REACTTOSLANG(reaction) {
       try {
-        if (this.liked == true || this.disliked == true) {
-          const deleteReactionPromise = this.DELETEUSERREACTION();
-          const reactionsPromise = this.GETSLANGREACTIONS();
-          const userReactionPromise = this.GETUSERSLANGREACTION();
-          await Promise.all([
-            reactionsPromise,
-            userReactionPromise,
-            deleteReactionPromise,
-          ]);
-          if(deleteReactionPromise) {
-            console.log(deleteReactionPromise)
-            this.liked = false,
-            this.disliked = false
+        if (this.user) {
+          if (this.liked == true || this.disliked == true) {
+            const deleteReactionPromise = this.DELETEUSERREACTION();
+            const reactionsPromise = this.GETSLANGREACTIONS();
+            const userReactionPromise = this.GETUSERSLANGREACTION();
+            await Promise.all([
+              reactionsPromise,
+              userReactionPromise,
+              deleteReactionPromise,
+            ]);
+            if (deleteReactionPromise) {
+              console.log(deleteReactionPromise);
+              (this.liked = false), (this.disliked = false);
+            }
+          } else {
+            const data = {
+              slang: this.slangDetails._id,
+              react: reaction,
+            };
+            const response = await this.$store.dispatch("createReaction", data);
+            console.log(response);
+            if (response) {
+              await this.GETSLANGREACTIONS();
+              await this.GETUSERSLANGREACTION();
+            }
           }
         } else {
-          const data = {
-            slang: this.slangDetails._id,
-            react: reaction,
-          };
-          const response = await this.$store.dispatch("createReaction", data);
-          console.log(response);
-          if (response) {
-            await this.GETSLANGREACTIONS();
-            await this.GETUSERSLANGREACTION();
-          }
+          this.$toast.open({
+            message: "User has to sign in to react to shang",
+            type: "error", // You can use 'success', 'info', 'error', or 'warning'
+            // Additional options
+            duration: 5000, // Duration in milliseconds
+            dismissible: true, // Whether the toast can be dismissed
+            position: "top", // Position of the toast
+          });
         }
       } catch (error) {
         throw error;
