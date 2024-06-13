@@ -16,7 +16,7 @@
           required
         />
         <div class="submitBox">
-          <button @click="changePassword">
+          <button @click="changePassword" class="submit">
             <span style="background: none" v-if="!loading">SUBMIT</span>
             <Loading style="margin: 0 auto" v-if="loading" />
           </button>
@@ -126,15 +126,19 @@ export default {
   color: #283d3f;
   background: #e0e0e4;
 }
-.form-section form button {
+.submit {
   border-radius: 5px;
   background-color: #586;
   color: white;
   border: none;
-  padding: 10px 100px;
+  text-align: center;
+  width: 250px;
+  padding: 10px 0;
+  text-align: center;
   cursor: pointer;
   margin-top: 20px;
   font-family: sans-serif;
+  white-space: nowrap;
 }
 @media only screen and (max-width: 1025px) {
   .container {
@@ -160,6 +164,9 @@ export default {
   .form-section form input {
     width: 100%;
     box-sizing: border-box;
+  }
+  .submit {
+    width: 350px
   }
 }
 </style>

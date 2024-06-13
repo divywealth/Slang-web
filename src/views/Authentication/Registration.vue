@@ -239,5 +239,8 @@ export default {
     width: 100%;
     box-sizing: border-box;
   }
+  .submit {
+    width: 350px
+  }
 }
 </style>

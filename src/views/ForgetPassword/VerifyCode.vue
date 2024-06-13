@@ -18,7 +18,8 @@
           <div v-if="errorCode" class="formError">
           {{ errorCode }}
         </div>
-          <div class="submitBox"><button>
+          <div class="submitBox">
+          <button class="submit">
             <span style="background: none" v-if="!loading">SUBMIT</span>
             <Loading style="margin: 0 auto" v-if="loading"/>
           </button></div>
@@ -216,15 +217,19 @@ export default {
   color: #283D3F;
   background: #e0e0e4;
 }
-.form-section form button{
+.submit{
   border-radius: 5px;
   background-color: #586;
   color: white;
   border: none;
-  padding: 10px 100px ;
+  text-align: center;
+  width: 250px;
+  padding: 10px 0;
+  text-align: center;
   cursor: pointer;
   margin-top: 20px;
   font-family: sans-serif;
+  white-space: nowrap;
 }
 .form-section span {
   cursor: pointer;
@@ -258,6 +263,9 @@ export default {
   .form-section form input {
     width: 100%;
     box-sizing: border-box
+  }
+  .submit {
+    width: 350px
   }
 }
 </style>
