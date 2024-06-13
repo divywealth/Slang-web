@@ -1,23 +1,35 @@
 <template>
   <main>
     <div class="no-pending">No Pending Slangs</div>
-    <div class="main-container" v-for="(pendingSlang, index) in pendingSlangs" :key="index">
+    <div
+      class="main-container"
+      v-for="(pendingSlang, index) in pendingSlangs"
+      :key="index"
+    >
       <div class="slang-section">
-        <p class="slang">{{pendingSlang.slang}}</p>
+        <p class="slang">{{ pendingSlang.slang }}</p>
         <div v-if="pendingSlang.meaning.length > maxLength">
-            <p style="margin-top: 10px; overflow-wrap: anywhere" v-if="showAll">
-                {{pendingSlang.meaning}}
-                <span @click="toggleShowAll" style="color: blue; cursor: pointer">Collapse</span>
-            </p>
-            <p style="margin-top: 10px; overflow-wrap: anywhere" v-else>
-                {{pendingSlang.meaning.length > maxLength ? pendingSlang.meaning.slice(0, maxLength) + "..." : pendingSlang.meaning}}
-                <span @click="toggleShowAll" style="color: blue; cursor: pointer">Read more</span>
-            </p>
+          <p style="margin-top: 10px; overflow-wrap: anywhere" v-if="showAll">
+            {{ pendingSlang.meaning }}
+            <span @click="toggleShowAll" style="color: blue; cursor: pointer"
+              >Collapse</span
+            >
+          </p>
+          <p style="margin-top: 10px; overflow-wrap: anywhere" v-else>
+            {{
+              pendingSlang.meaning.length > maxLength
+                ? pendingSlang.meaning.slice(0, maxLength) + "..."
+                : pendingSlang.meaning
+            }}
+            <span @click="toggleShowAll" style="color: blue; cursor: pointer"
+              >Read more</span
+            >
+          </p>
         </div>
         <div v-else>
-            <p style="margin-top: 10px; overflow-wrap: anywhere">
-            {{pendingSlang.meaning}}
-            </p>
+          <p style="margin-top: 10px; overflow-wrap: anywhere">
+            {{ pendingSlang.meaning }}
+          </p>
         </div>
       </div>
       <div class="button-section">
@@ -42,34 +54,34 @@ export default {
     };
   },
   mounted() {
-    this.GETPENDINGSLANG()
+    this.GETPENDINGSLANG();
   },
   methods: {
     toggleShowAll() {
-        this.showAll = !this.showAll
+      this.showAll = !this.showAll;
     },
     async GETPENDINGSLANG() {
       try {
-        const response = await this.$store.dispatch("getPendingSlangs")
-        this.pendingSlangs = response
+        const response = await this.$store.dispatch("getPendingSlangs");
+        this.pendingSlangs = response;
       } catch (error) {
         throw error;
       }
     },
     async APPROVESLANG(id) {
       try {
-        const response = await this.$store.dispatch("approveSlang", id)
-        console.log(response)
-        await this.GETPENDINGSLANG()
+        const response = await this.$store.dispatch("approveSlang", id);
+        console.log(response);
+        await this.GETPENDINGSLANG();
       } catch (error) {
         throw error;
       }
     },
     async DICLINESLANG(id) {
       try {
-        const response = await this.$store.dispatch("deleteSlang", id)
-        console.log(response)
-        await this.GETPENDINGSLANG()
+        const response = await this.$store.dispatch("deleteSlang", id);
+        console.log(response);
+        await this.GETPENDINGSLANG();
       } catch (error) {
         throw error;
       }
@@ -95,16 +107,17 @@ main {
   overflow-wrap: break-word;
 }
 .slang-section {
-    flex: 1
+  flex: 1;
+  display: block;
 }
 .button-section {
 }
 .no-pending {
-    font-size: 30px;
-    display: flex;
-    font-weight: bold;
-    align-items: center;
-    justify-content: center
+  font-size: 30px;
+  display: flex;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
 }
 .button-section button {
   border-radius: 5px;
@@ -119,8 +132,8 @@ main {
   white-space: nowrap;
 }
 .slang {
-    font-family: sans-serif;
-    font-weight: bold
+  font-family: sans-serif;
+  font-weight: bold;
 }
 @media only screen and (max-width: 1025px) {
   .main-container {
