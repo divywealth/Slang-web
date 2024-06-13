@@ -320,7 +320,6 @@ export default {
 }
 .android-section {
   flex: 1;
-  display: none;
 }
 .android-modal {
   display: flex;
@@ -353,8 +352,8 @@ export default {
 }
 @media only screen and (max-width: 1025px) {
   .android-section {
-    display: block;
     position: fixed;
+    overflow-y: auto;
     width: 100%;
     height: 100%;
     top: 0;
@@ -389,8 +388,8 @@ export default {
 }
 @media only screen and (max-width: 900px) {
   .android-section {
-    display: block;
     position: fixed;
+    overflow-y: auto;
     width: 100%;
     height: 100%;
     top: 0;
