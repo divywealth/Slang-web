@@ -174,7 +174,7 @@ export default {
         this.show_spinner = false;
         this.gottenSlangDetails = true;
       } catch (error) {
-        if (error) {
+        if (error === 'Slang not available you can try adding the slang if you know the meaning.') {
           this.slangError = error;
         }
         this.show_spinner = false;
@@ -345,7 +345,7 @@ export default {
   margin-bottom: 27px;
 }
 .note {
-  color: #7b87a1;
+  color: white;
   font-family: sans-serif;
   font-size: 15px;
 }

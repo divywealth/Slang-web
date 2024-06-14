@@ -70,7 +70,7 @@ export default {
           return response;
         }
       } catch (error) {
-        if (error) {
+        if (error === "Slang already exist") {
           this.$toast.open({
             message: error,
             type: "error", // You can use 'success', 'info', 'error', or 'warning'

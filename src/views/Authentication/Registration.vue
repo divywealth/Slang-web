@@ -117,7 +117,7 @@ export default {
           });
         }
       } catch (error) {
-        if (error) {
+        if (error === 'Email has an account') {
           this.$toast.open({
             message: error,
             type: "error", // You can use 'success', 'info', 'error', or 'warning'
